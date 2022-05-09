@@ -19,17 +19,17 @@ class ASOSScraper(unittest.TestCase):
         self.driver = webdriver.Chrome("/home/danny/chromedriver")
         self.driver.get("https://www.asos.com/") 
     
-    def test_accept_cookies(self, driver = webdriver.Chrome("/home/danny/chromedriver")):
+    def test_accept_cookies(self):
         self.driver.get("https://www.asos.com/")
-        WebDriverWait(driver, 100).until(
-            driver.find_element(By.ID, "onetrust-accept-btn-handler"))
-        cookie = driver.find_element(By.ID, "onetrust-accept-btn-handler")
+        WebDriverWait(self.driver, 100).until(
+            self.driver.find_element(By.ID, "onetrust-accept-btn-handler"))
+        cookie = self.driver.find_element(By.ID, "onetrust-accept-btn-handler")
         cookie.click()
 
     def est_load_more_results(self):
         self.driver.get("https://www.asos.com/")
         search = self.driver.find_element(By.NAME, "q")
-        search.send_keys("T Shirt")
+        search.send_keys("T Shirt")xxx
         search.send_keys(Keys.RETURN)
         WebDriverWait(self, 100).until(
             self.driver.find_element(By.CLASS_NAME, "_39_qNys"))
