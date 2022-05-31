@@ -39,7 +39,7 @@ class ASOSScraper(unittest.TestCase):
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located ((By.XPATH, '//*[@id="att_lightbox_close"]/svg/path')))
             self.driver.find_element(By.ID, "att_lightbox_close").click()
             print('discount closed')
-        except:
+        except TimeoutError:
             print('no discounts yet')
             
     #function to search the website
@@ -213,8 +213,9 @@ class ASOSScraper(unittest.TestCase):
             UUID=self.create_uuid()
             self.driver.get(href)
             print("DBG: Clicking dets container")
+            self.close_discount
             self.driver.find_element(By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]').click()
-            self.close_discount()
+            self.close_discount
             print('Discount Closed')
 
         prodcode = self.driver.find_element(By.XPATH,'//*[@id="product-details-container"]/div[2]/div[1]/p')

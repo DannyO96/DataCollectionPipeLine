@@ -2,7 +2,7 @@ from selenium.webdriver.common.by import By
 
 class MainPageLocators(object):
 
-    GO_BUTTON = (By.NAME, "q")
+    SEARCH_BAR = (By.NAME, "q")
     ACCEPT_COOKIES = (By.ID, "onetrust-accept-btn-handler")
 
 class SearchResultsPageLocators(object):

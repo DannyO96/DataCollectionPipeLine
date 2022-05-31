@@ -1,12 +1,11 @@
 from telnetlib import SE
 from xml.dom.minidom import Element
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from locator import MainPageLocators
 from locator import SearchResultsPageLocators
 from element import BasePageElement
 
-class SearchTextElement(BasePageElement):
-    locator = 'q'
 
 class BasePage(object):
 
@@ -16,23 +15,21 @@ class BasePage(object):
 
 class MainPage(BasePage):
 
-    search_text_element = SearchTextElement()
-
     def does_title_match(self):
         return "ASOS" in self.driver.title
 
-    def click_go_button(self):
-        element = self.driver.find_element(*MainPageLocators.GO_BUTTON)
+    def click_search_bar(self):
+        element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
         element.click()
     
     def accept_cookies(self):
         element = self.driver.find_element(*MainPageLocators.ACCEPT_COOKIES)
         element.click()
 
-    def search_asos(self, value):
-        element = self.driver.find_element(*SearchTextElement.locator)
-        element.click()
-        element.sendkeys("t shirt")
+    def search_asos(self):
+        element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
+        element(Keys,'t shirt')
+        element(Keys.RETURN)
 
 
 
@@ -51,6 +48,7 @@ class SearchResultPage(BasePage):
                 pass
             else:
                 href_list.append(href)
+        print(href_list)
         return(href_list)
         
         
