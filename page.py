@@ -28,8 +28,8 @@ class MainPage(BasePage):
 
     def search_asos(self):
         element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
-        element(Keys,'t shirt')
-        element(Keys.RETURN)
+        element.send_keys("t shirt")
+        element.send_keys(Keys.RETURN)
 
 
 

@@ -25,6 +25,8 @@ class ASOSScraper(unittest.TestCase):
         option.add_argument('--disable-notifications')
         option.add_argument('--disable-forms')
         option.add_argument('--disable-scripts')
+        #option.add_argument('--headless')
+        #option.add_argument('--disable-gpu')  
         self.driver = webdriver.Chrome("/home/danny/chromedriver",chrome_options = option)
         self.driver.get("https://www.asos.com/")
 
