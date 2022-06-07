@@ -16,13 +16,13 @@ class AsosScraper(unittest.TestCase):
         mainPage = page.MainPage(self.driver)
         assert mainPage.does_title_match(self)
 
-    def test_accept_cookies(self):
+    def est_accept_cookies(self):
         mainPage = page.MainPage(self.driver)
-        mainPage.accept_cookies
+        mainPage.accept_cookies()
 
     def search_asos(self):
         mainPage = page.MainPage(self.driver)
-        mainPage.search_asos
+        mainPage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
     
     def est_print_product_list(self):
@@ -33,9 +33,10 @@ class AsosScraper(unittest.TestCase):
         
     def test_get_href_list(self):
         mainPage = page.MainPage(self.driver)
-        mainPage.search_asos = "tshirt"
+        mainPage.accept_cookies()
+        mainPage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        search_result_page.get_href_List
+        search_result_page.get_href_List()
         
     def tearDown(self):
         self.driver.close
