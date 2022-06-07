@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from locator import MainPageLocators
 from locator import SearchResultsPageLocators
 from element import BasePageElement
+from tqdm import tqdm
 
 
 class BasePage(object):
@@ -48,8 +49,18 @@ class SearchResultPage(BasePage):
                 pass
             else:
                 href_list.append(href)
-        print(href_list)
         return(href_list)
+
+    def scrape_links(self):
+        href_list = self.get_href_List()
+
+        prodcode_list = []
+        sizeinfo_list = []
+        imginfo_list = []
+        proddetails_list = []
+        aboutprod_list = []
+        priceinfo_list = []
+        
         
         
 
