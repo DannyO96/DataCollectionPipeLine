@@ -39,7 +39,7 @@ class ASOSScraper(unittest.TestCase):
     def close_discount(self):
         try: 
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located ((By.XPATH, '//*[@id="att_lightbox_close"]/svg/path')))
-            self.driver.find_element(By.ID, "att_lightbox_close").click()
+            self.driver.find_element(By.XPATH, '//*[@id="att_lightbox_close"]/svg/path').click()
             print('discount closed')
         except TimeoutError:
             print('no discounts yet')
@@ -94,6 +94,7 @@ class ASOSScraper(unittest.TestCase):
                 href_list.append(href)
         return(href_list)
 
+    #function to obtain product info via product aria labels
     def est_obtain_product_info(self):
         self.search_asos()
         aria_list = []
@@ -112,6 +113,7 @@ class ASOSScraper(unittest.TestCase):
         print(aria_list)
         return(aria_list)
 
+    #function  to obtain a dictionary of product information
     def est_obtain_product_info_dict(self):
         self.search_asos()
         aria_list = []
@@ -209,30 +211,33 @@ class ASOSScraper(unittest.TestCase):
         # then we get a new panda which is compriosed of that dict. (Idealls we would add a new panbda dataframe for each href and save the dict memory, gut I don;t know how to add panda dataframe to the existing dataframe thing.
         # )
 
-        for href in tqdm(href_list):
+        for i in tqdm(href_list):
             
             #UUID = str(uuid.uuid4())
             UUID=self.create_uuid()
-            self.driver.get(href)
+            self.driver.get(i)
             print("DBG: Clicking dets container")
             self.close_discount
-            self.driver.find_element(By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]').click()
-            self.close_discount
-            print('Discount Closed')
+            try:
+                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located ((By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]')))
+                self.driver.find_element(By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]').click()
+            except TimeoutError:
+                self.close_discount
+                print('Discount Closed')
 
-        prodcode = self.driver.find_element(By.XPATH,'//*[@id="product-details-container"]/div[2]/div[1]/p')
-        sizeinfo = self.driver.find_element(By.XPATH, '//*[@id="main-size-select-0"]')
-        imginfo = self.driver.find_element(By.XPATH, '//*[@id="product-details-container"]/div[3]/div[1]/p')
-        proddetails = self.driver.find_element(By.XPATH, '//*[@id="product-details-container"]/div[1]/div')
-        aboutprod = self.driver.find_element(By.XPATH, '//*[@id="product-details-container"]/div[3]/div[2]/p')
-        priceinfo = self.driver.find_element(By.XPATH, '//*[@id="product-price"]/div[1]/span[2]')
+            prodcode = self.driver.find_element(By.XPATH,'//*[@id="product-details-container"]/div[2]/div[1]/p')
+            sizeinfo = self.driver.find_element(By.XPATH, '//*[@id="main-size-select-0"]')
+            imginfo = self.driver.find_element(By.XPATH, '//*[@id="product-details-container"]/div[3]/div[1]/p')
+            proddetails = self.driver.find_element(By.XPATH, '//*[@id="product-details-container"]/div[1]/div')
+            aboutprod = self.driver.find_element(By.XPATH, '//*[@id="product-details-container"]/div[3]/div[2]/p')
+            priceinfo = self.driver.find_element(By.XPATH, '//*[@id="product-price"]/div[1]/span[2]')
 
-        prodcode_list.append(prodcode.text)
-        sizeinfo_list.append(sizeinfo.text)
-        imginfo_list.append(imginfo.text)
-        proddetails_list.append(proddetails.text)
-        aboutprod_list.append(aboutprod.text)
-        priceinfo_list.append(priceinfo.text)
+            prodcode_list.append(prodcode.text)
+            sizeinfo_list.append(sizeinfo.text)
+            imginfo_list.append(imginfo.text)
+            proddetails_list.append(proddetails.text)
+            aboutprod_list.append(aboutprod.text)
+            priceinfo_list.append(priceinfo.text)
 
         #hprd = {UUID:{'prodcode': prodcode,'sizeinfo': sizeinfo, 'imginfo': imginfo,'proddeatails': proddetails,'aboutprod': aboutprod,'priceinfo': priceinfo}}
         #print("DEBUG: prodcode " + str(hprd['prodcode']) + " UUID="+UUID)
@@ -242,7 +247,7 @@ class ASOSScraper(unittest.TestCase):
         #df = pd.DataFrame{(72, 6), index == UUID, columns == dict{'details': proddetails, 'about' : aboutprod, 'pricing' : priceinfo, 'imginfo' : imginfo, 'prodcode' : prodcode, 'sizeinfo': sizeinfo,}}
         #df = pd.DataFrame(hprd)    
 
-        prod_dict = { UUID : {'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list}}
+            prod_dict = { UUID : {'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list}}
         frame = pd.DataFrame(prod_dict)
         print(frame.T)
         
@@ -253,8 +258,8 @@ class ASOSScraper(unittest.TestCase):
 
 
     def tearDown(self):
-            self.driver.close()
-
+        self.driver.close()
+    
 
 if __name__ == "__main__":
     unittest.main()
