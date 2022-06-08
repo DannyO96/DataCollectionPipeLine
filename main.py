@@ -1,6 +1,4 @@
 import unittest
-
-from jmespath import search
 import page
 import locator
 import time
@@ -46,6 +44,8 @@ class AsosScraper(unittest.TestCase):
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         search_result_page.get_href_List()
+        product_page = page.ProductPage(self.driver)
+        product_page.scrape_links()
         
     def tearDown(self):
         self.driver.close

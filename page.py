@@ -1,8 +1,11 @@
+import uuid
+import pandas as pd
 from telnetlib import SE
 from xml.dom.minidom import Element
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from locator import MainPageLocators
+from locator import ProductPageLocators
 from locator import SearchResultsPageLocators
 from element import BasePageElement
 from tqdm import tqdm
@@ -25,7 +28,8 @@ class MainPage(BasePage):
     
     def accept_cookies(self):
         element = self.driver.find_element(*MainPageLocators.ACCEPT_COOKIES)
-        element.click()
+        element.wait_to_locate.click()
+
 
     def search_asos(self):
         element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
@@ -51,20 +55,37 @@ class SearchResultPage(BasePage):
                 href_list.append(href)
         return(href_list)
 
-    def scrape_links(self):
-        href_list = self.get_href_List()
+    def is_results_found(self):
+        return "No results found." not in self.driver.page_source
 
+class ProductPage(BasePage):
+
+    def create_uuid(self):
+        UUID = str(uuid.uuid4())
+        return UUID
+
+    def scrape_links(self):
+        href_list = SearchResultPage.get_href_List(self)
         prodcode_list = []
         sizeinfo_list = []
         imginfo_list = []
         proddetails_list = []
         aboutprod_list = []
         priceinfo_list = []
-        
-        
-        
 
-    def is_results_found(self):
-        return "No results found." not in self.driver.page_source
-
-
+        for href in tqdm(href_list):
+            UUID = self.create_uuid()
+            self.driver.get(href)
+            element = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+            element.click()
+            prodcode_list.append(*ProductPageLocators.PRODUCT_CODE)
+            sizeinfo_list.append(*ProductPageLocators.SIZE_INFO)
+            imginfo_list.append(*ProductPageLocators.IMG_INFO)
+            proddetails_list.append(*ProductPageLocators.PRODUCT_DETAILS)
+            aboutprod_list.append(*ProductPageLocators.ABOUT_PRODUCT)
+            priceinfo_list.append(*ProductPageLocators.PRICE_INFO)
+            prod_dict = { UUID : {'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list}}
+        frame = pd.DataFrame(prod_dict)
+        print(frame.T)
+        return(frame.T)
+    

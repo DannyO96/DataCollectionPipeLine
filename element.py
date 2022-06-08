@@ -1,4 +1,4 @@
-
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 class BasePageElement(object):
@@ -16,5 +16,8 @@ class BasePageElement(object):
             driver.find_element_by_name(self.locator))
         element = driver.find_element_by_name(self.locator)
         return element.get_attribute("value")
+    
+    def wait_to_locate(self, obj):
+        driver = obj.driver
+        WebDriverWait(driver, 100).until(EC.presence_of_element_located(self.locator))
         
-
