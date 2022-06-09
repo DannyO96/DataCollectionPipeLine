@@ -1,6 +1,5 @@
 import unittest
 import page
-import locator
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys

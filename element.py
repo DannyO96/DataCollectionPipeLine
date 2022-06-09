@@ -19,5 +19,7 @@ class BasePageElement(object):
     
     def wait_to_locate(self, obj):
         driver = obj.driver
-        WebDriverWait(driver, 100).until(EC.presence_of_element_located(self.locator))
+        element = WebDriverWait(driver, 100).until(EC.presence_of_element_located(self.locator))
+        
+
         

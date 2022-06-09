@@ -1,14 +1,16 @@
+from cgitb import text
 import uuid
 import pandas as pd
 from telnetlib import SE
 from xml.dom.minidom import Element
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from locator import MainPageLocators
-from locator import ProductPageLocators
-from locator import SearchResultsPageLocators
+from locators import MainPageLocators
+from locators import ProductPageLocators
+from locators import SearchResultsPageLocators
 from element import BasePageElement
 from tqdm import tqdm
+
 
 
 class BasePage(object):
@@ -27,8 +29,10 @@ class MainPage(BasePage):
         element.click()
     
     def accept_cookies(self):
-        element = self.driver.find_element(*MainPageLocators.ACCEPT_COOKIES)
-        element.wait_to_locate.click()
+        element = BasePageElement
+        locator = self.driver.find_element(*MainPageLocators.ACCEPT_COOKIES)
+        element.wait_to_locate(locator)
+        locator.click()
 
 
     def search_asos(self):
