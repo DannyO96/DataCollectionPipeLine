@@ -1,8 +1,5 @@
-from cgitb import text
 import uuid
 import pandas as pd
-from telnetlib import SE
-from xml.dom.minidom import Element
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -77,17 +74,26 @@ class ProductPage(BasePage):
         aboutprod_list = []
         priceinfo_list = []
 
-        for href in tqdm(href_list):
+        for i in tqdm(href_list):
             UUID = self.create_uuid()
-            self.driver.get(href)
+            self.driver.get(i)
             element = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
             element.click()
-            prodcode_list.append(*ProductPageLocators.PRODUCT_CODE)
-            sizeinfo_list.append(*ProductPageLocators.SIZE_INFO)
-            imginfo_list.append(*ProductPageLocators.IMG_INFO)
-            proddetails_list.append(*ProductPageLocators.PRODUCT_DETAILS)
-            aboutprod_list.append(*ProductPageLocators.ABOUT_PRODUCT)
-            priceinfo_list.append(*ProductPageLocators.PRICE_INFO)
+
+            prodcode = self.driver.find_element(*ProductPageLocators.PRODUCT_CODE)
+            sizeinfo = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
+            imginfo = self.driver.find_element(*ProductPageLocators.IMG_INFO)
+            proddetails = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS)
+            aboutprod = self.driver.find_element(*ProductPageLocators.ABOUT_PRODUCT)
+            priceinfo = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
+
+            prodcode_list.append(prodcode.text)
+            sizeinfo_list.append(sizeinfo.text)
+            imginfo_list.append(imginfo.text)
+            proddetails_list.append(proddetails.text)
+            aboutprod_list.append(aboutprod.text)
+            priceinfo_list.append(priceinfo.text)
+            
             prod_dict = { UUID : {'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list}}
         frame = pd.DataFrame(prod_dict)
         print(frame.T)
