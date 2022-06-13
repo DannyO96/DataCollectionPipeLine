@@ -4,6 +4,8 @@ import pandas as pd
 from telnetlib import SE
 from xml.dom.minidom import Element
 from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from locators import MainPageLocators
 from locators import ProductPageLocators
@@ -29,11 +31,9 @@ class MainPage(BasePage):
         element.click()
     
     def accept_cookies(self):
-        element = BasePageElement
-        locator = self.driver.find_element(*MainPageLocators.ACCEPT_COOKIES)
-        element.wait_to_locate(locator)
-        locator.click()
-
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        element.click()
+        
 
     def search_asos(self):
         element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
