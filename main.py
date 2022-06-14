@@ -8,7 +8,13 @@ from selenium.webdriver.common.keys import Keys
 class AsosScraper(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.Chrome("/home/danny/chromedriver")
+        option = webdriver.ChromeOptions()
+        option.add_argument('--disable-notifications')
+        option.add_argument('--disable-forms')
+        option.add_argument('--disable-scripts')
+        #option.add_argument('--headless')
+        #option.add_argument('--disable-gpu')  
+        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
         self.driver.get("https://www.asos.com/")
 
     def title(self):
@@ -19,7 +25,7 @@ class AsosScraper(unittest.TestCase):
         mainPage = page.MainPage(self.driver)
         mainPage.accept_cookies()
 
-    def search_asos(self):
+    def est_search_asos(self):
         mainPage = page.MainPage(self.driver)
         mainPage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
