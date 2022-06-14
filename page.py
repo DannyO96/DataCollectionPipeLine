@@ -11,13 +11,13 @@ from element import BasePageElement
 from tqdm import tqdm
 
 
-
+#The parent Page class containing general page object methods
 class BasePage(object):
 
     def __init__(self, driver):
         self.driver = driver
 
-
+#The main page class containing methods occuring on the main page of the website
 class MainPage(BasePage):
 
     def does_title_match(self):
@@ -37,8 +37,7 @@ class MainPage(BasePage):
         element.send_keys("t shirt")
         element.send_keys(Keys.RETURN)
 
-
-
+#Search results page class containing methods occuring on the search results page of the website
 class SearchResultPage(BasePage):
 
     def get_href_List(self):
@@ -59,6 +58,7 @@ class SearchResultPage(BasePage):
     def is_results_found(self):
         return "No results found." not in self.driver.page_source
 
+#Product page class containing methods occuring on the page of a product 
 class ProductPage(BasePage):
 
     def create_uuid(self):
@@ -75,8 +75,8 @@ class ProductPage(BasePage):
         priceinfo_list = []
 
         for i in tqdm(href_list):
-            UUID = self.create_uuid()
             self.driver.get(i)
+            UUID = self.create_uuid()
             element = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
             element.click()
 
