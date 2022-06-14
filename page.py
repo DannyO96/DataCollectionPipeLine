@@ -66,13 +66,16 @@ class ProductPage(BasePage):
         return UUID
 
     def scrape_links(self):
+
         href_list = SearchResultPage.get_href_List(self)
-        prodcode_list = []
-        sizeinfo_list = []
-        imginfo_list = []
-        proddetails_list = []
-        aboutprod_list = []
-        priceinfo_list = []
+        #prodcode_list = []
+        #sizeinfo_list = []
+        #imginfo_list = []
+        #proddetails_list = []
+        #aboutprod_list = []
+        #priceinfo_list = []
+        #frame = pd.DataFrame(prod_dict, index = UUID, columns = list('prodcode', 'sizeinfo', 'imginfo', 'proddetails', 'aboutprod', 'priceinfo'))
+        frame = pd.DataFrame()
 
         for i in tqdm(href_list):
             self.driver.get(i)
@@ -87,15 +90,15 @@ class ProductPage(BasePage):
             aboutprod = self.driver.find_element(*ProductPageLocators.ABOUT_PRODUCT)
             priceinfo = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
 
-            prodcode_list.append(prodcode.text)
-            sizeinfo_list.append(sizeinfo.text)
-            imginfo_list.append(imginfo.text)
-            proddetails_list.append(proddetails.text)
-            aboutprod_list.append(aboutprod.text)
-            priceinfo_list.append(priceinfo.text)
+            #prodcode_list.append(prodcode.text)
+            #sizeinfo_list.append(sizeinfo.text)
+            #imginfo_list.append(imginfo.text)
+            #proddetails_list.append(proddetails.text)
+            #aboutprod_list.append(aboutprod.text)
+            #.append(priceinfo.text)
             
-            prod_dict = { UUID : {'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list}}
-        frame = pd.DataFrame(prod_dict)
+            prod_dict = { UUID : {'prodcode': prodcode.text, 'sizeinfo' : sizeinfo.text, 'imginfo' : imginfo.text, 'proddetails' : proddetails.text, 'aboutprod' : aboutprod.text, 'priceinfo'  : priceinfo.text}}
+            frame = frame.append(prod_dict,ignore_index=True)
         print(frame.T)
         return(frame.T)
     
