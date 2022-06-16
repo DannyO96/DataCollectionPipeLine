@@ -62,11 +62,17 @@ class SearchResultPage(BasePage):
 class ProductPage(BasePage):
     def close_modal_popup(self):
         try: 
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located (ProductPageLocators.STUDENT_DISCOUNT))
-            self.driver.find_element(ProductPageLocators.STUDENT_DISCOUNT).send_keys(Keys.ESCAPE)
+            element = WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT))
+            self.driver.execute_script("arguments[0].click();", element)
             print('discount closed')
-        except TimeoutError:
+        except Exception as ex:
             print('no discounts yet')
+
+    def close_popup(self):
+        self.driver.SwitchTo().frame('#secure-script-container')
+        element = self.driver.findElement(*ProductPageLocators.STUDENT_DISCOUNT)
+        element.click()
+        self.driver.SwitchTo().defaultContent()
 
     def create_uuid(self):
         UUID = str(uuid.uuid4())
@@ -87,10 +93,14 @@ class ProductPage(BasePage):
             self.driver.get(i)
             print("current href is ???", i)
             UUID = self.create_uuid()
-            webdriver.ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
             element = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-            webdriver.ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
-            element.click()
+            #self.close_popup()
+            try:
+                element.click()
+            except Exception as ex:
+                self.driver.close()
+                element.click()
+
             #(/html/body)
 
             prodcode = self.driver.find_element(*ProductPageLocators.PRODUCT_CODE)
