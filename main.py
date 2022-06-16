@@ -13,6 +13,8 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-notifications')
         option.add_argument('--disable-forms')
         option.add_argument('--disable-scripts')
+        option.add_argument('--disable-same-origin')
+        option.add_argument('--disable-modal-content')
         #option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
@@ -48,9 +50,9 @@ class AsosScraper(unittest.TestCase):
         mainpage.accept_cookies()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        search_result_page.get_href_List()
+        self.href_list = page.SearchResultPage.get_href_List(self)
         product_page = page.ProductPage(self.driver)
-        product_page.scrape_links()
+        product_page.scrape_links(self.href_list)
 
     #Method to close the webdriver    
     def tearDown(self):
