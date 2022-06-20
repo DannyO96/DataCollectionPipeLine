@@ -14,6 +14,7 @@ class SearchResultsPageLocators(object):
 
 class ProductPageLocators(object):
 
+    PRODUCT_NAME = (By.TAG_NAME, 'h1')
     PRODUCT_DETAILS_CONTAINER = (By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]')
     PRODUCT_CODE = (By.XPATH,'//*[@id="product-details-container"]/div[2]/div[1]/p')
     SIZE_INFO = (By.XPATH, '//*[@id="main-size-select-0"]')

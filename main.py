@@ -16,7 +16,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-secure-containers')
         option.add_argument('--disable-same-origin')
         option.add_argument('--disable-secure-scripts')
-        #option.add_argument("--window-size=1920,1080")
+        option.add_argument("--window-size=1920,1080")
         #option.add_argument("--disable-extensions")
         option.add_argument('--no-sandbox')
         #option.add_argument('--allow-insecure-localhost')
@@ -44,16 +44,16 @@ class AsosScraper(unittest.TestCase):
         mainPage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
 
-    #Test to obtain a list of links to products  
-    def est_get_image_list(self):
+    #Test to obtain a list of links to images  
+    def est_get_image_links(self):
         mainPage = page.MainPage(self.driver)
         mainPage.accept_cookies()
         mainPage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        search_result_page.get_image_links()
+        self.image_link_list = page.SearchResultPage.get_image_links(self)
 
     #Test to create a pd dataframe of product information
-    def est_create_pd_dataframe(self):
+    def test_create_pd_dataframe(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.search_asos()

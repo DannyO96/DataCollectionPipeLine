@@ -1,5 +1,6 @@
 import uuid
 import pandas as pd
+import urllib.request
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -56,6 +57,12 @@ class SearchResultPage(BasePage):
         print(image_links)
         return(image_links)
 
+    #def download_images(url):
+    #    name = "no"
+        fullname = str(name)+".jpg"
+        urllib.request.urlretrieve(url,fullname)     
+    #download_images()
+
     def get_href_List(self):
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
         products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)
@@ -102,7 +109,9 @@ class ProductPage(BasePage):
         return UUID
 
     def scrape_links(self, href_list):
-
+        image_link_list = []
+        productname_list = []
+        uuid_list = []
         prodcode_list = []
         sizeinfo_list = []
         imginfo_list = []
@@ -110,7 +119,7 @@ class ProductPage(BasePage):
         aboutprod_list = []
         priceinfo_list = []
         #frame = pd.DataFrame(prod_dict, index = UUID, columns = list('prodcode', 'sizeinfo', 'imginfo', 'proddetails', 'aboutprod', 'priceinfo'))
-        frame = pd.DataFrame()
+        #frame = pd.DataFrame()
 
         for i in tqdm(href_list):
             self.driver.get(i)
@@ -121,15 +130,23 @@ class ProductPage(BasePage):
             self.switch_iframes()
             element.click()
             self.switch_iframes()
+            
+            
             #(/html/body)
 
+            product_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
             prodcode = self.driver.find_element(*ProductPageLocators.PRODUCT_CODE)
             sizeinfo = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
             imginfo = self.driver.find_element(*ProductPageLocators.IMG_INFO)
             proddetails = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS)
             aboutprod = self.driver.find_element(*ProductPageLocators.ABOUT_PRODUCT)
             priceinfo = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
-
+            img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
+            image_link = img_tag.get_attribute('src')
+            
+            image_link_list.append(image_link)
+            productname_list.append(product_name.text)
+            uuid_list.append(UUID)
             prodcode_list.append(prodcode.text)
             sizeinfo_list.append(sizeinfo.text)
             imginfo_list.append(imginfo.text)
@@ -137,9 +154,10 @@ class ProductPage(BasePage):
             aboutprod_list.append(aboutprod.text)
             priceinfo_list.append(priceinfo.text)
 
-            prod_dict = {'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list}
-            frame = pd.DataFrame.from_dict(prod_dict)
+            prod_dict = {'productname': productname_list,'href': i, 'UUID': uuid_list, 'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list, 'imglinks' : image_link_list}
+        frame = pd.DataFrame.from_dict(prod_dict, ignore_index=True)
+            #frame.reindex(UUID)
             #frame = frame.append(prod_dict, ignore_index=True)
         print(frame)
         return(frame)
-     
+    
