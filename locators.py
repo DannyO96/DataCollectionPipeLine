@@ -10,6 +10,7 @@ class SearchResultsPageLocators(object):
     PRODUCT_CONTAINER = (By.CLASS_NAME, '_3YREj-P')
     PRODUCT_LIST = (By.CLASS_NAME, "_2qG85dG")
     A_TAG = (By.TAG_NAME, 'a')
+    IMG_TAG = (By.TAG_NAME, 'img')
 
 class ProductPageLocators(object):
 

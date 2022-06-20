@@ -40,6 +40,22 @@ class MainPage(BasePage):
 #Search results page class containing methods occuring on the search results page of the website
 class SearchResultPage(BasePage):
 
+    def get_image_links(self):
+        product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
+        products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)
+        image_links = []
+
+        for product in products:
+            img_tag = product.find_element(*SearchResultsPageLocators.IMG_TAG)
+            image_link = img_tag.get_attribute('src')
+
+            if image_link in image_links:
+                pass
+            else:
+                image_links.append(image_link)
+        print(image_links)
+        return(image_links)
+
     def get_href_List(self):
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
         products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)

@@ -45,15 +45,15 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
 
     #Test to obtain a list of links to products  
-    def est_get_href_list(self):
+    def est_get_image_list(self):
         mainPage = page.MainPage(self.driver)
         mainPage.accept_cookies()
         mainPage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        search_result_page.get_href_List()
+        search_result_page.get_image_links()
 
     #Test to create a pd dataframe of product information
-    def test_create_pd_dataframe(self):
+    def est_create_pd_dataframe(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.search_asos()
