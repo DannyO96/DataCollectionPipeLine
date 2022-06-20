@@ -15,13 +15,13 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-scripts')
         option.add_argument('--disable-secure-containers')
         option.add_argument('--disable-same-origin')
-
+        option.add_argument('--disable-secure-scripts')
         #option.add_argument("--window-size=1920,1080")
         #option.add_argument("--disable-extensions")
         option.add_argument('--no-sandbox')
         #option.add_argument('--allow-insecure-localhost')
-
-        option.add_argument('--disable-modal-content')
+        #option.add_argument('--disable-blink-features=AutomationControlled')
+        #option.add_argument('--disable-modal-content')
         #option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
 

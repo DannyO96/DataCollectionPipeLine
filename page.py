@@ -62,17 +62,24 @@ class SearchResultPage(BasePage):
 class ProductPage(BasePage):
     def close_modal_popup(self):
         try: 
-            element = WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT))
+            element = WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT_CLOSE))
             self.driver.execute_script("arguments[0].click();", element)
             print('discount closed')
         except Exception as ex:
             print('no discounts yet')
 
     def close_popup(self):
-        self.driver.SwitchTo().frame('#secure-script-container')
-        element = self.driver.findElement(*ProductPageLocators.STUDENT_DISCOUNT)
+        self.driver.switch_to.frame(*ProductPageLocators.STUDENT_DISCOUNT_IFRAME)
+        element = self.driver.find_element(*ProductPageLocators.STUDENT_DISCOUNT_CLOSE)
         element.click()
-        self.driver.SwitchTo().defaultContent()
+        self.driver.Switch_to.defaultContent()
+
+    def switch_iframes(self):
+        iframes = self.driver.find_elements(*ProductPageLocators.IFRAMES)
+        print(len(iframes))
+        for iframe in iframes:
+            self.driver.switch_to.frame(iframe)        
+            self.driver.switch_to.default_content()
 
     def create_uuid(self):
         UUID = str(uuid.uuid4())
@@ -91,16 +98,13 @@ class ProductPage(BasePage):
 
         for i in tqdm(href_list):
             self.driver.get(i)
-            print("current href is ???", i)
+            print("current href is ?", i)
             UUID = self.create_uuid()
+            self.switch_iframes()
             element = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-            #self.close_popup()
-            try:
-                element.click()
-            except Exception as ex:
-                self.driver.close()
-                element.click()
-
+            self.switch_iframes()
+            element.click()
+            self.switch_iframes()
             #(/html/body)
 
             prodcode = self.driver.find_element(*ProductPageLocators.PRODUCT_CODE)
@@ -120,6 +124,6 @@ class ProductPage(BasePage):
             prod_dict = {'prodcode': prodcode_list, 'sizeinfo' : sizeinfo_list, 'imginfo' : imginfo_list, 'proddetails' : proddetails_list, 'aboutprod' : aboutprod_list, 'priceinfo'  : priceinfo_list}
             frame = pd.DataFrame.from_dict(prod_dict)
             #frame = frame.append(prod_dict, ignore_index=True)
-        print(frame.T)
-        return(frame.T)
+        print(frame)
+        return(frame)
      

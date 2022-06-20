@@ -20,6 +20,8 @@ class ProductPageLocators(object):
     PRODUCT_DETAILS = (By.XPATH, '//*[@id="product-details-container"]/div[1]/div')
     ABOUT_PRODUCT = (By.XPATH, '//*[@id="product-details-container"]/div[3]/div[2]/p')
     PRICE_INFO = (By.XPATH, '//*[@id="product-price"]/div[1]/span[2]')
-    STUDENT_DISCOUNT = (By.XPATH, '//*[@id="att_lightbox_close"]/svg/path')
+    STUDENT_DISCOUNT_IFRAME = (By.XPATH, "//*[@id='secure-script-container']")
+    IFRAMES = (By.TAG_NAME,"iframe")
+    STUDENT_DISCOUNT_CLOSE = (By.XPATH, '//*[@id="att_lightbox_close"]/svg/path')
 
    
