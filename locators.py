@@ -35,5 +35,5 @@ class ProductPageLocators(object):
     SIZE_AND_FIT = (By.XPATH, '//*[@id="productDescriptionSizeAndFit"]')
     LOOK_AFTER_ME_BUTTTON = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[4]/div/h3/button')
     LOOK_AFTER_ME = (By.XPATH, '//*[@id="productDescriptionCareInfo"]')
-    ABOUT_ME_BUTTON = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[5]/div/h3')
+    ABOUT_ME_BUTTON = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[5]/div/h3/button')
     ABOUT_ME = (By.XPATH, '//*[@id="productDescriptionAboutMe"]')

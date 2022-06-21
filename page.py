@@ -185,6 +185,7 @@ class ProductPage(BasePage):
                 try:
                     element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
                     element.click()
+                    print('clicked container')
                     #self.close_alert()
                     #self.switch_iframes()
                 
@@ -198,8 +199,28 @@ class ProductPage(BasePage):
                     img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
                     image_link = img_tag.get_attribute('src')
 
-                    prod_dict = {'product_name': product_name.text,'href': i, 'UUID': UUID, 'product_code': product_code.text, 'size_info' : size_info.text, 'img_info' : img_info.text, 'product_details' : product_details.text, 'about_product' : about_product.text, 'price_info'  : price_info.text, 'img_link' : image_link}
-                    frame = pd.DataFrame.from_dict(prod_dict, ignore_index=True)
+                    image_link_list = []
+                    product_name_list = []
+                    uuid_list = []
+                    product_code_list = []
+                    size_info_list = []
+                    imginfo_list = []
+                    product_details_list = []
+                    about_product_list = []
+                    price_info_list = []
+
+                    image_link_list.append(image_link)
+                    product_name_list.append(product_name.text)
+                    uuid_list.append(UUID)
+                    product_code_list.append(product_code.text)
+                    size_info_list.append(size_info.text)
+                    imginfo_list.append(img_info.text)
+                    product_details_list.append(product_details.text)
+                    about_product_list.append(about_product.text)
+                    price_info_list.append(price_info.text)
+
+                    prod_dict = {'product_name': product_name_list,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
+                    frame = pd.DataFrame.from_dict(prod_dict)
                     print(frame)
                     break
                 except:
@@ -224,16 +245,19 @@ class ProductPage(BasePage):
                     brand = self.driver.find_element(*ProductPageLocators.BRAND)
                     brand_list.append(brand.text)
                     self.switch_iframes()
-
-                    element3 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT_BUTTON))
-                    element3.click()
-                    size_and_fit = self.driver.find_element(*ProductPageLocators.SIZE_AND_FIT)
-                    size_and_fit_list.append(size_and_fit.text)
-
+                    try:
+                        element3 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT_BUTTON))
+                        element3.click()
+                        size_and_fit = self.driver.find_element(*ProductPageLocators.SIZE_AND_FIT)
+                        size_and_fit_list.append(size_and_fit.text)
+                    except:
+                        pass    
                     element4 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME_BUTTTON))
                     element4.click()
                     look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
                     look_after_me_list.append(look_after_me.text)
+                    
+                        
 
                     element5 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME_BUTTON))
                     element5.click()
@@ -248,12 +272,14 @@ class ProductPage(BasePage):
                     img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
                     image_link = img_tag.get_attribute('src')
 
-                    prod_dict = {'product_name': product_name.text,'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : price_info.text, 'img_link' : image_link}
+                    self.switch_iframes()
+
+                    prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
                     frame = pd.DataFrame.from_dict(prod_dict)
                     print(frame)
                     break
                 except:
-                    self.switch_iframes()
+                    #self.switch_iframes()
                     print('lap')
 
                 
