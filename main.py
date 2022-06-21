@@ -16,7 +16,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-secure-containers')
         option.add_argument('--disable-same-origin')
         option.add_argument('--disable-secure-scripts')
-        option.add_argument("--window-size=1920,1080")
+        #option.add_argument("--window-size=1920,1080")
         #option.add_argument("--disable-extensions")
         option.add_argument('--no-sandbox')
         #option.add_argument('--allow-insecure-localhost')
@@ -24,6 +24,7 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-modal-content')
         #option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
+        #option.add_argument("start-maximized")
 
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
         self.driver.get("https://www.asos.com/")
@@ -53,7 +54,7 @@ class AsosScraper(unittest.TestCase):
         self.image_link_list = page.SearchResultPage.get_image_links(self)
 
     #Test to create a pd dataframe of product information
-    def test_create_pd_dataframe(self):
+    def est_create_pd_dataframe(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.search_asos()
@@ -61,6 +62,16 @@ class AsosScraper(unittest.TestCase):
         self.href_list = page.SearchResultPage.get_href_List(self)
         product_page = page.ProductPage(self.driver)
         product_page.scrape_links(self.href_list)
+
+    #Test to create a product dictionaries aquired from multiple product page types
+    def test_create_dicts_on_dif_prod_pages(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.accept_cookies()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = page.SearchResultPage.get_href_List(self)
+        product_page = page.ProductPage(self.driver)
+        product_page.scrape_links_on_multiple_product_pages(self.href_list)
 
     #Method to close the webdriver    
     def tearDown(self):
