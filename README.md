@@ -10,7 +10,8 @@ Although I wrote a try and except block to close the discount it appears to not 
 
 Recently asos appear to have updated the website with a new product page type i have had to write a try and except block to manage the variation of product page types this and the student discount iframe have severly hindered my progress as tests rarely get to the point where i can see my dataframes form.
 
-Have implemented the dataframe to json pandas method to locally store my dataframes i have also implemented urllib retrive to download images from the src link from the image tag of the html element corresponding to the image 
+Have implemented the dataframe to json pandas method to locally store my dataframes in a date time sensitive manner. I have also implemented urllib retrive to download images from the src link from the image tag of the html element corresponding to the image.
+
 
 
 
