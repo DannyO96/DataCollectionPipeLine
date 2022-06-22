@@ -1,6 +1,8 @@
+import os
 import uuid
 import pandas as pd
 import urllib.request
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -81,6 +83,11 @@ class SearchResultPage(BasePage):
 
     def is_results_found(self):
         return "No results found." not in self.driver.page_source
+
+     #function to load more search results after the initial search
+    def load_more_results(self):
+        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located (SearchResultsPageLocators.LOAD_MORE))
+        element.click()
 
 #Product page class containing methods occuring on the page of a product 
 class ProductPage(BasePage):
@@ -222,6 +229,12 @@ class ProductPage(BasePage):
                     prod_dict = {'product_name': product_name_list,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
                     frame = pd.DataFrame.from_dict(prod_dict)
                     print(frame)
+                    folder = r"/home/danny/git/DataCollectionPipeline/raw_data"
+                    filename = product_name_list
+                    sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+                    os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/" f"{filename}{sys_dtime}")
+                    filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
+                    frame.to_json(filepath, orient = 'table')
                     break
                 except:
                     pass
@@ -252,17 +265,20 @@ class ProductPage(BasePage):
                         size_and_fit_list.append(size_and_fit.text)
                     except:
                         pass    
+                    self.switch_iframes()
                     element4 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME_BUTTTON))
                     element4.click()
                     look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
                     look_after_me_list.append(look_after_me.text)
                     
                         
-
-                    element5 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME_BUTTON))
-                    element5.click()
-                    about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
-                    about_me_list.append(about_me.text)
+                    try:
+                        element5 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME_BUTTON))
+                        element5.click()
+                        about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
+                        about_me_list.append(about_me.text)
+                    except:
+                        pass
 
                     self.switch_iframes()
 
@@ -272,17 +288,26 @@ class ProductPage(BasePage):
                     img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
                     image_link = img_tag.get_attribute('src')
 
-                    self.switch_iframes()
+                    
 
                     prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
+                    self.switch_iframes()
                     frame = pd.DataFrame.from_dict(prod_dict)
                     print(frame)
+                    folder = r"/home/danny/git/DataCollectionPipeline/raw_data"
+                    filename = product_name.text
+                    sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+                    os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data"f"{filename}{sys_dtime}")
+                    filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
+                    frame.to_json(filepath, orient = 'table')
                     break
                 except:
                     #self.switch_iframes()
                     print('lap')
 
-                
+
+                urllib.urlretrieve(src, "captcha.png")
+
 
 
 

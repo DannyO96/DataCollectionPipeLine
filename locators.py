@@ -11,6 +11,7 @@ class SearchResultsPageLocators(object):
     PRODUCT_LIST = (By.CLASS_NAME, "_2qG85dG")
     A_TAG = (By.TAG_NAME, 'a')
     IMG_TAG = (By.TAG_NAME, 'img')
+    LOAD_MORE = (By.CLASS_NAME, "_39_qNys")
 
 class ProductPageLocators(object):
 #primary product page locator
@@ -37,3 +38,5 @@ class ProductPageLocators(object):
     LOOK_AFTER_ME = (By.XPATH, '//*[@id="productDescriptionCareInfo"]')
     ABOUT_ME_BUTTON = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[5]/div/h3/button')
     ABOUT_ME = (By.XPATH, '//*[@id="productDescriptionAboutMe"]')
+
+    OUT_OF_STOCK = (By.XPATH, '//*[@id="oos-label"]/h3')
