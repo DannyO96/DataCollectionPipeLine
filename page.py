@@ -1,3 +1,4 @@
+from email.mime import image
 import os
 import uuid
 import pandas as pd
@@ -305,7 +306,7 @@ class ProductPage(BasePage):
                     #self.switch_iframes()
                     print('lap')
 
-
+                #urllib to download image
                 urllib.urlretrieve(src, "captcha.png")
 
 
