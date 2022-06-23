@@ -12,6 +12,9 @@ Recently asos appear to have updated the website with a new product page type i 
 
 Have implemented the dataframe to json pandas method to locally store my dataframes in a date time sensitive manner. I have also implemented urllib retrive to download images from the src link from the image tag of the html element corresponding to the image.
 
+After rethinking my page object model to improve the efficiency of my program i need to separate the page scraping methods and create a method to assert the type of product page before the link is scraped
+
+
 
 
 

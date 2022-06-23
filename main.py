@@ -64,7 +64,7 @@ class AsosScraper(unittest.TestCase):
         product_page.scrape_links(self.href_list)
 
     #Test to create a product dictionaries aquired from multiple product page types
-    def test_create_dicts_on_dif_prod_pages(self):
+    def est_create_dicts_on_dif_prod_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.search_asos()
@@ -72,6 +72,17 @@ class AsosScraper(unittest.TestCase):
         self.href_list = page.SearchResultPage.get_href_List(self)
         product_page = page.ProductPage(self.driver)
         product_page.scrape_links_on_multiple_product_pages(self.href_list)
+
+    def test_locally_save_data_prod_pages(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.accept_cookies()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = page.SearchResultPage.get_href_List(self)
+        product_page = page.ProductPage(self.driver)
+        product_page.scrape_prod_pages(self.href_list)
+
+
 
     #Method to close the webdriver    
     def tearDown(self):

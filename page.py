@@ -1,8 +1,11 @@
-from email.mime import image
+import unicodedata
+import re
 import os
 import uuid
 import pandas as pd
 import urllib.request
+import selenium
+from slugify import slugify
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -230,10 +233,10 @@ class ProductPage(BasePage):
                     prod_dict = {'product_name': product_name_list,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
                     frame = pd.DataFrame.from_dict(prod_dict)
                     print(frame)
-                    folder = r"/home/danny/git/DataCollectionPipeline/raw_data"
                     filename = product_name_list
                     sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-                    os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/" f"{filename}{sys_dtime}")
+                    os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+                    folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
                     filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
                     frame.to_json(filepath, orient = 'table')
                     break
@@ -295,10 +298,10 @@ class ProductPage(BasePage):
                     self.switch_iframes()
                     frame = pd.DataFrame.from_dict(prod_dict)
                     print(frame)
-                    folder = r"/home/danny/git/DataCollectionPipeline/raw_data"
                     filename = product_name.text
                     sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-                    os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data"f"{filename}{sys_dtime}")
+                    os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+                    folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
                     filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
                     frame.to_json(filepath, orient = 'table')
                     break
@@ -307,7 +310,187 @@ class ProductPage(BasePage):
                     print('lap')
 
                 #urllib to download image
-                urllib.urlretrieve(src, "captcha.png")
+                #urllib.urlretrieve(src, "captcha.png")
+
+    def assert_prod_page_type(self, UUID, i):
+        
+        try:
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+            frame, filename = self.scrape_primary_prodpage(UUID, i)
+        except:
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+            try:
+                frame, filename = self.scrape_secondary_product_page(UUID, i)
+            except:
+                frame, filename = self.scrape_tertiary_product_page(UUID, i)
+        return(frame, filename)
+        
+
+        #number of buttons = sec or tert
+    
+
+    def scrape_primary_prodpage(self, i, UUID):
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+        element.click()
+        print('clicked container')
+        #self.close_alert()
+        #self.switch_iframes()
+    
+        product_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
+        product_code = self.driver.find_element(*ProductPageLocators.PRODUCT_CODE)
+        size_info = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
+        img_info = self.driver.find_element(*ProductPageLocators.IMG_INFO)
+        product_details = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS)
+        about_product = self.driver.find_element(*ProductPageLocators.ABOUT_PRODUCT)
+        price_info = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
+        img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
+        image_link = img_tag.get_attribute('src')
+
+        image_link_list = []
+        product_name_list = []
+        uuid_list = []
+        product_code_list = []
+        size_info_list = []
+        imginfo_list = []
+        product_details_list = []
+        about_product_list = []
+        price_info_list = []
+
+        image_link_list.append(image_link)
+        #product_name_list.append(product_name.text)
+        uuid_list.append(UUID)
+        product_code_list.append(product_code.text)
+        size_info_list.append(size_info.text)
+        imginfo_list.append(img_info.text)
+        product_details_list.append(product_details.text)
+        about_product_list.append(about_product.text)
+        price_info_list.append(price_info.text)
+        name = (product_name.text)
+
+        prod_dict = {'product_name': name,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
+        frame = pd.DataFrame.from_dict(prod_dict)
+        print(frame)
+        filename = product_name_list
+        return(frame, filename)
+
+    def scrape_secondary_product_page(self, i, UUID):
+        product_description_list = []
+        brand_list = []
+        size_and_fit_list = []
+        look_after_me_list = []
+        about_me_list = []
+
+        #self.switch_iframes()
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+        element.click()
+        self.switch_iframes()
+        product_description = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
+        product_description_list.append(product_description.text)
+
+        element2 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.BRAND_BUTTON))
+        element2.click()
+        brand = self.driver.find_element(*ProductPageLocators.BRAND)
+        brand_list.append(brand.text)
+        #self.switch_iframes()
+        
+        element3 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT_BUTTON))
+        element3.click()
+        size_and_fit = self.driver.find_element(*ProductPageLocators.SIZE_AND_FIT)
+        size_and_fit_list.append(size_and_fit.text)
+      
+        #self.switch_iframes()
+        element4 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME_BUTTTON))
+        element4.click()
+        look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
+        look_after_me_list.append(look_after_me.text)
+        
+        element5 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME_BUTTON))
+        element5.click()
+        about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
+        about_me_list.append(about_me.text)
+        
+        #self.switch_iframes()
+
+        product_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
+        size_info = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
+        price_info = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
+        img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
+        image_link = img_tag.get_attribute('src')
+
+        prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
+        self.switch_iframes()
+        frame = pd.DataFrame.from_dict(prod_dict)
+        print(frame)
+        filename = (product_name.text)
+        return(frame, filename)
+        
+
+    def scrape_tertiary_product_page(self, i, UUID):
+        product_description_list = []
+        brand_list = []
+        look_after_me_list = []
+        about_me_list = []
+
+        #self.switch_iframes()
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+        element.click()
+        self.switch_iframes()
+        product_description = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
+        product_description_list.append(product_description.text)
+
+        element2 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.BRAND_BUTTON))
+        element2.click()
+        brand = self.driver.find_element(*ProductPageLocators.BRAND)
+        brand_list.append(brand.text)
+        #self.switch_iframes()
+        
+        #self.switch_iframes()
+        element3 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME_BUTTTON2))
+        element3.click()
+        look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
+        look_after_me_list.append(look_after_me.text)
+        
+            
+        
+        element4 = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME_BUTTON2))
+        element4.click()
+        about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
+        about_me_list.append(about_me.text)
+
+        #self.switch_iframes()
+
+        prod_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
+        size_info = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
+        price_info = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
+        img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
+        image_link = img_tag.get_attribute('src')
+        product_name = (prod_name.text)
+
+        prod_dict = {'product_name': product_name,'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
+        self.switch_iframes()
+        frame = pd.DataFrame.from_dict(prod_dict)
+        print(frame)
+        filename = product_name
+        return(frame, filename)
+        
+
+    def save_dataframe_locally(self, frame, filename):
+        #filename = product_name.text
+        new_filename = slugify(filename)
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{new_filename}{sys_dtime}")
+        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{new_filename}{sys_dtime}")
+        filepath = os.path.join(folder, f"{new_filename}{sys_dtime}.json")
+        frame.to_json(filepath, orient = 'table')
+
+    def scrape_prod_pages(self, href_list):
+        for i in tqdm(href_list):
+            self.driver.get(i)
+            UUID = self.create_uuid()
+            frame, filename = self.assert_prod_page_type(i, UUID)
+            self.save_dataframe_locally(frame, filename)
+
+
 
 
 
