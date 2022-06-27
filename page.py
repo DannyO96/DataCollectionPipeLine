@@ -1,4 +1,3 @@
-import unicodedata
 import re
 import os
 import uuid
@@ -370,7 +369,7 @@ class ProductPage(BasePage):
         prod_dict = {'product_name': name,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
         frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
-        filename = product_name_list
+        filename = name
         return(frame, filename)
 
     def scrape_secondary_product_page(self, i, UUID):
@@ -482,10 +481,17 @@ class ProductPage(BasePage):
         folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{new_filename}{sys_dtime}")
         filepath = os.path.join(folder, f"{new_filename}{sys_dtime}.json")
         frame.to_json(filepath, orient = 'table')
+        filepath2 = os.path.join(folder, f"{new_filename}{sys_dtime}.jpeg")
+        img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
+        image_link = img_tag.get_attribute('src')
+        urllib.request.urlretrieve(image_link, filepath2)
+
 
     def scrape_prod_pages(self, href_list):
         for i in tqdm(href_list):
             self.driver.get(i)
+            img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
+            image_link = img_tag.get_attribute('src')
             UUID = self.create_uuid()
             frame, filename = self.assert_prod_page_type(i, UUID)
             self.save_dataframe_locally(frame, filename)
