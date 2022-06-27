@@ -27,19 +27,65 @@ class BasePage(object):
 class MainPage(BasePage):
 
     def does_title_match(self):
+        """
+        This is a function to check is the name of the site is in the title of the webpage.
+
+        Args:
+            param1:self 
+
+        Returns:
+            Returns a bool for if a phrase is in the title of the webpage in this case ASOS
+
+        Raises:
+            Error "ASOS" not in self.driver.title
+        """
         return "ASOS" in self.driver.title
 
     def click_search_bar(self):
+        """
+        This function clicks the searchbar on the website homepage
+
+        Args:
+            param1:self
+        Returns:
+
+        Raises:
+            Element not found if search bar isnt present on the page
+        """
         element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
         element.click()
     
     def accept_cookies(self):
+        """
+        This is a function to accept cookies after loading the webpage
+
+        Args:
+            param1:self
+
+        Returns:
+            Clears cookie cache and clicks the accept cookies button
+
+        Raises:
+            ElementNotFound: If the presence of the element is not located
+        """
         self.driver.delete_all_cookies()
         element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
         
 
     def search_asos(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1:self
+
+        Returns:
+            Searches a phrase into the searchbar and enters the search results page
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
         element.send_keys("tshirt")
         element.send_keys(Keys.RETURN)
@@ -48,6 +94,18 @@ class MainPage(BasePage):
 class SearchResultPage(BasePage):
 
     def get_image_links(self):
+        """
+        This function generates a list of image links from the search results page
+
+        Args:
+            param1:self
+
+        Returns:
+            A list of image links located using the img tag and the src attribute
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
         products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)
         image_links = []
@@ -70,6 +128,18 @@ class SearchResultPage(BasePage):
     #download_images()
 
     def get_href_List(self):
+        """
+        This is a function to generate a list of products links(hrefs)
+
+        Args:
+            param1:self
+
+        Returns:
+            Returns a list of links to product pages
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
         products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)
         href_list = []
@@ -85,16 +155,54 @@ class SearchResultPage(BasePage):
         return(href_list)
 
     def is_results_found(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: self
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         return "No results found." not in self.driver.page_source
 
      #function to load more search results after the initial search
     def load_more_results(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located (SearchResultsPageLocators.LOAD_MORE))
         element.click()
 
 #Product page class containing methods occuring on the page of a product 
 class ProductPage(BasePage):
     def close_modal_popup(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         try: 
             element = WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT_CLOSE))
             self.driver.execute_script("arguments[0].click();", element)
@@ -103,12 +211,38 @@ class ProductPage(BasePage):
             print('no discounts yet')
 
     def frame_switch(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         self.driver.switch_to.frame(ProductPageLocators.STUDENT_DISCOUNT_IFRAME)
         element = self.driver.find_element(*ProductPageLocators.STUDENT_DISCOUNT_CLOSE)
         element.click()
         self.driver.Switch_to.default_content()
 
     def switch_iframes(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         iframes = self.driver.find_elements(*ProductPageLocators.IFRAMES)
         print(len(iframes))
         for iframe in iframes:
@@ -116,6 +250,19 @@ class ProductPage(BasePage):
             self.driver.switch_to.default_content()
 
     def close_alert(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         iframes = self.driver.find_elements(*ProductPageLocators.IFRAMES)
         print(len(iframes))
         for iframe in iframes:
@@ -128,10 +275,36 @@ class ProductPage(BasePage):
         self.driver.switch_to.default_content()
 
     def create_uuid(self):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         UUID = str(uuid.uuid4())
         return UUID
 
     def scrape_links(self, href_list):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         image_link_list = []
         productname_list = []
         uuid_list = []
@@ -185,6 +358,19 @@ class ProductPage(BasePage):
         return(frame)
     
     def scrape_links_on_multiple_product_pages(self, href_list):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
 
         for i in tqdm(href_list):
             self.driver.get(i)
@@ -312,6 +498,19 @@ class ProductPage(BasePage):
                 #urllib.urlretrieve(src, "captcha.png")
 
     def assert_prod_page_type(self, UUID, i):
+        """
+        This is an example of Google style.
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         
         try:
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
@@ -329,6 +528,21 @@ class ProductPage(BasePage):
     
 
     def scrape_primary_prodpage(self, i, UUID):
+        """
+        This is a function to scrape the primary product page type for information it clicks the product details container the creates a dataframe 
+        of product information
+
+        Args:
+            param1: self
+            param2: i - this is the href of the product
+            param3: UUID the generated unique user id for the product in this instance of scraping
+
+        Returns:
+            This function returns the dataframe of product information and the filename which is the full product name
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
         element.click()
         print('clicked container')
@@ -373,6 +587,22 @@ class ProductPage(BasePage):
         return(frame, filename)
 
     def scrape_secondary_product_page(self, i, UUID):
+        """
+        This is a function to scrape the secondary product page type for information it clicks the product details buttons and appends the revealed text to a list
+        then creates a dataframe of product information
+
+        Args:
+            param1: self
+            param2: i - this is the href of the product
+            param3: UUID the generated unique user id for the product in this instance of scraping
+
+        Returns:
+            This function returns the dataframe of product information and the filename which is the full product name
+
+        Raises:
+            KeyError: Raises an exception.
+        """
+
         product_description_list = []
         brand_list = []
         size_and_fit_list = []
@@ -425,6 +655,22 @@ class ProductPage(BasePage):
         
 
     def scrape_tertiary_product_page(self, i, UUID):
+        """
+        This is a function to scrape the tertiary product page type for information it clicks the product details buttons and appends the revealed text to a list
+        then creates a dataframe of product information
+
+        Args:
+            param1: self
+            param2: i - this is the href of the product
+            param3: UUID the generated unique user id for the product in this instance of scraping
+
+        Returns:
+            This function returns the dataframe of product information and the filename which is the full product name
+
+        Raises:
+            KeyError: Raises an exception.
+        """
+
         product_description_list = []
         brand_list = []
         look_after_me_list = []
@@ -474,13 +720,29 @@ class ProductPage(BasePage):
         
 
     def save_dataframe_locally(self, frame, filename):
+        """
+        This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
+
+        Args:
+            param1: self
+            param2: frame - this is the dataframe returned from scraping one of the types of product page
+            param3: filename - this is the name of the product
+
+        Returns:
+            This returns a folder in the raw_data folder where the name of the product is turned into a slug so it can be used as a foldername the foldername also incoperates 
+            sys dtime to avoid duplicate folders and allow for time period analysis of the data. The folder returned is named after the product and contains the gallery image jpeg and
+            the dataframe in json format.
+            
+        Raises:
+            KeyError: Raises an exception.
+        """
         #filename = product_name.text
         new_filename = slugify(filename)
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{new_filename}{sys_dtime}")
         folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{new_filename}{sys_dtime}")
         filepath = os.path.join(folder, f"{new_filename}{sys_dtime}.json")
-        frame.to_json(filepath, orient = 'table')
+        frame.to_json(filepath, orient = 'table', default_handler=str)
         filepath2 = os.path.join(folder, f"{new_filename}{sys_dtime}.jpeg")
         img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
         image_link = img_tag.get_attribute('src')
@@ -488,6 +750,19 @@ class ProductPage(BasePage):
 
 
     def scrape_prod_pages(self, href_list):
+        """
+        This is a function to scrape multiple product page types
+
+        Args:
+            param1: This is the first param.
+            param2: This is a second param.
+
+        Returns:
+            This is a description of what is returned.
+
+        Raises:
+            KeyError: Raises an exception.
+        """
         for i in tqdm(href_list):
             self.driver.get(i)
             img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)

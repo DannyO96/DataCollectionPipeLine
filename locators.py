@@ -14,8 +14,8 @@ class SearchResultsPageLocators(object):
     LOAD_MORE = (By.CLASS_NAME, "_39_qNys")
 
 class ProductPageLocators(object):
-    self.elements = {define:
-    }
+    #self.elements = {define:
+    #}
 #primary product page 
     GALLERY_IMAGE = (By.XPATH, '//*[@id="product-gallery"]/div[2]/div[2]/div[2]/img')
     PRODUCT_NAME = (By.XPATH, '//*[@id="aside-content"]/div[1]/h1')
