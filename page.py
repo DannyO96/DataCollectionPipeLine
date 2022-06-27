@@ -172,14 +172,13 @@ class SearchResultPage(BasePage):
      #function to load more search results after the initial search
     def load_more_results(self):
         """
-        This is an example of Google style.
+        This is a function to click the load more button on the search results page
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
+            param1: self.
 
         Returns:
-            This is a description of what is returned.
+            This returns a search results page with more search results loaded
 
         Raises:
             KeyError: Raises an exception.
@@ -191,7 +190,7 @@ class SearchResultPage(BasePage):
 class ProductPage(BasePage):
     def close_modal_popup(self):
         """
-        This is an example of Google style.
+        This is a function i created in an attempt to close the student discount modal popups
 
         Args:
             param1: This is the first param.
@@ -359,11 +358,11 @@ class ProductPage(BasePage):
     
     def scrape_links_on_multiple_product_pages(self, href_list):
         """
-        This is an example of Google style.
+        This is a function I created to scrape links on multiple products page types contained in one function.
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
+            param1: self.
+            param2: href_list.
 
         Returns:
             This is a description of what is returned.
@@ -499,11 +498,12 @@ class ProductPage(BasePage):
 
     def assert_prod_page_type(self, UUID, i):
         """
-        This is an example of Google style.
+        This is a function to determine the type of product page the webdriver is on.
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
+            param1: self.
+            param2: i - this is the href of the product.
+            param3: UUID the generated unique user id for the product in this instance of scraping.
 
         Returns:
             This is a description of what is returned.
@@ -732,7 +732,7 @@ class ProductPage(BasePage):
             This returns a folder in the raw_data folder where the name of the product is turned into a slug so it can be used as a foldername the foldername also incoperates 
             sys dtime to avoid duplicate folders and allow for time period analysis of the data. The folder returned is named after the product and contains the gallery image jpeg and
             the dataframe in json format.
-            
+
         Raises:
             KeyError: Raises an exception.
         """
@@ -754,19 +754,18 @@ class ProductPage(BasePage):
         This is a function to scrape multiple product page types
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
+            param1: self.
+            param2: href_list, this is a list of links to product pages returned from the function get href list.
 
         Returns:
-            This is a description of what is returned.
+            This function iterates through every link in the href list, creates a UUID for the product asserts the type of product page then creates a dataframe and saves it locally
+            in a folder in the raw data folder with the image and dataframe contained in the folder.
 
         Raises:
             KeyError: Raises an exception.
         """
         for i in tqdm(href_list):
             self.driver.get(i)
-            img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
-            image_link = img_tag.get_attribute('src')
             UUID = self.create_uuid()
             frame, filename = self.assert_prod_page_type(i, UUID)
             self.save_dataframe_locally(frame, filename)

@@ -14,6 +14,7 @@ Have implemented the dataframe to json pandas method to locally store my datafra
 
 After rethinking my page object model to improve the efficiency of my program i need to separate the page scraping methods and create a method to assert the type of product page before the link is scraped
 
+The dataframes obtained from scraping are now saved in a folder with gallery images from the products page and these folders are saved in a date time sensitive manner to allow for analysis of product information over time. Its likely that we might want to make predictions based upon the data and being able to study the data over time allows for more accurate predictions.
 
 
 
