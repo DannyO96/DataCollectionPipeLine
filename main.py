@@ -30,7 +30,7 @@ class AsosScraper(unittest.TestCase):
         self.driver.get("https://www.asos.com/")
 
     #Test that we are on the webpage
-    def title(self):
+    def est_title(self):
         mainPage = page.MainPage(self.driver)
         assert mainPage.does_title_match(self)
 
@@ -73,7 +73,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_links_on_multiple_product_pages(self.href_list)
 
-    def test_locally_save_data_prod_pages(self):
+    def est_locally_save_data_prod_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.search_asos()
@@ -82,7 +82,14 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-
+    def test_scrape_buttons_pages(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.accept_cookies()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = page.SearchResultPage.get_href_List(self)
+        product_page = page.ProductPage(self.driver)
+        product_page.scrape_prod_pages(self.href_list)
 
     #Method to close the webdriver    
     def tearDown(self):

@@ -23,6 +23,7 @@ class BasePage(object):
     def __init__(self, driver):
         self.driver = driver
 
+
 #The main page class containing methods occuring on the main page of the website
 class MainPage(BasePage):
 
@@ -292,7 +293,8 @@ class ProductPage(BasePage):
 
     def scrape_links(self, href_list):
         """
-        This is an example of Google style.
+        This is my original function to scrape links from asos product pages this function was made before asos introduced multiple product page types and as such no longer works
+        successfully.
 
         Args:
             param1: This is the first param.
@@ -495,6 +497,16 @@ class ProductPage(BasePage):
 
                 #urllib to download image
                 #urllib.urlretrieve(src, "captcha.png")
+    
+    def chooze_page(self, UUID, i):
+        try:
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+            frame, filename = self.scrape_primary_prodpage(UUID, i)
+        except:
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+            frame, filename = self.scrape_buttons_pages(UUID, i)
+        return(frame, filename)
+
 
     def assert_prod_page_type(self, UUID, i):
         """
@@ -608,7 +620,7 @@ class ProductPage(BasePage):
         size_and_fit_list = []
         look_after_me_list = []
         about_me_list = []
-
+        
         #self.switch_iframes()
         element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
         element.click()
@@ -717,7 +729,83 @@ class ProductPage(BasePage):
         print(frame)
         filename = product_name
         return(frame, filename)
+
+    def scrape_buttons_pages(self, i ,UUID):
+        """
+        This is a function to 
+        Args:
+            param1: self
+            param2: i - this is the href of the product
+            param3: UUID the generated unique user id for the product in this instance of scraping
+
+        Returns:
+            This function returns the dataframe of product information and the filename which is the full product name
+
+        Raises:
+            KeyError: Raises an exception.
+        """
+        product_description_list = []
+        brand_list = []
+        size_and_fit_list = []
+        look_after_me_list = []
+        about_me_list = []
         
+        buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
+        for button in buttons:
+            button.click()
+            #text = button.get_attribute("aria-label")
+            if self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION):
+                product_description = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
+                product_description_list.append(product_description.text)
+            elif self.driver.find_element(*ProductPageLocators.BRAND):
+                brand = self.driver.find_element(*ProductPageLocators.BRAND)
+                brand_list.append(brand.text)
+            elif self.driver.find_element(*ProductPageLocators.SIZE_AND_FIT):
+                size_and_fit = self.driver.find_elements(*ProductPageLocators.SIZE_AND_FIT)
+                size_and_fit_list.append(size_and_fit)
+            elif self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME):
+                look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
+                look_after_me_list.append(look_after_me)
+            else :
+                about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
+                about_me_list.append(about_me.text)
+
+        product_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
+        size_info = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
+        price_info = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
+        img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
+        image_link = img_tag.get_attribute('src')
+
+        prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
+        self.switch_iframes()
+        frame = pd.DataFrame.from_dict(prod_dict)
+        print(frame)
+        filename = (product_name.text)
+        return(frame, filename)
+
+        '''
+        product_elements = {'product description':{'list': product_description_list,
+                                                   'buttonXpathtxt': ProductPageLocators.PRODUCT_DESCRIPTION,
+                                                   'morepageregex': '.*desc:(.*)'},
+                                          'brand':{'list': brand_list,
+                                                   'buttonXpathtxt': ProductPageLocators.BRAND,},
+                                     'size & fit':{'list': size_and_fit_list,
+                                                   'buttonXpathtxt': ProductPageLocators.SIZE_AND_FIT},
+                                  'look after me':{'list': look_after_me_list,
+                                                   'buttonXpathtxt': ProductPageLocators.LOOK_AFTER_ME},
+                                       'about me':{'list': about_me_list,
+                                                   'buttonXpathtxt': ProductPageLocators.ABOUT_ME},
+                                                   }
+        
+        element_list = keys(product_elements)
+        #for button in (*buttons list xpath)
+        # grab the text for the button & delete that element from elelist
+
+        #For any more elements add to unexpect list
+        #for any thikng left in elelist append a NULL to the listpointer.list
+        '''
+    
+
 
     def save_dataframe_locally(self, frame, filename):
         """
@@ -767,7 +855,7 @@ class ProductPage(BasePage):
         for i in tqdm(href_list):
             self.driver.get(i)
             UUID = self.create_uuid()
-            frame, filename = self.assert_prod_page_type(i, UUID)
+            frame, filename = self.chooze_page(i, UUID)
             self.save_dataframe_locally(frame, filename)
 
 
