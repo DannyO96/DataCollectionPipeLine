@@ -730,7 +730,7 @@ class ProductPage(BasePage):
         filename = product_name
         return(frame, filename)
 
-    def scrape_buttons_pages(self, i ,UUID):
+    def scrape_mobile_pages(self, i ,UUID):
         """
         This is a function to 
         Args:
@@ -778,7 +778,7 @@ class ProductPage(BasePage):
 
         prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
         self.switch_iframes()
-        frame = pd.DataFrame.from_dict(prod_dict)
+        frame = pd.DataFrame.from_dict(prod_dict, ignore_index=True)
         print(frame)
         filename = (product_name.text)
         return(frame, filename)
@@ -855,7 +855,7 @@ class ProductPage(BasePage):
         for i in tqdm(href_list):
             self.driver.get(i)
             UUID = self.create_uuid()
-            frame, filename = self.chooze_page(i, UUID)
+            frame, filename = self.assert_prod_page_type(i, UUID)
             self.save_dataframe_locally(frame, filename)
 
 

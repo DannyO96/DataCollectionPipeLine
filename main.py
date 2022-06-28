@@ -16,7 +16,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-secure-containers')
         option.add_argument('--disable-same-origin')
         option.add_argument('--disable-secure-scripts')
-        #option.add_argument("--window-size=1920,1080")
+        option.add_argument("--window-size=1920,1080")
         #option.add_argument("--disable-extensions")
         option.add_argument('--no-sandbox')
         #option.add_argument('--allow-insecure-localhost')
@@ -25,6 +25,7 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
         #option.add_argument("start-maximized")
+        
 
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
         self.driver.get("https://www.asos.com/")
@@ -73,7 +74,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_links_on_multiple_product_pages(self.href_list)
 
-    def est_locally_save_data_prod_pages(self):
+    def test_locally_save_data_prod_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.search_asos()
@@ -82,7 +83,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-    def test_scrape_buttons_pages(self):
+    def est_scrape_buttons_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.search_asos()
