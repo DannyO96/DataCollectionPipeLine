@@ -77,6 +77,7 @@ class AsosScraper(unittest.TestCase):
     def test_locally_save_data_prod_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
+        mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = page.SearchResultPage.get_href_List(self)
@@ -86,6 +87,7 @@ class AsosScraper(unittest.TestCase):
     def est_scrape_buttons_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
+        mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = page.SearchResultPage.get_href_List(self)

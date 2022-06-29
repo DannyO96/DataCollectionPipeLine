@@ -4,7 +4,9 @@ class MainPageLocators(object):
 
     SEARCH_BAR = (By.NAME, "q")
     ACCEPT_COOKIES = (By.ID, "onetrust-accept-btn-handler")
-
+    WOMEN_SECTION = (By.XPATH, '//*[@id="globalBannerComponent"]/div/div/div/a[1]')
+    MEN_SECTION = (By.XPATH, '//*[@id="globalBannerComponent"]/div/div/div/a[2]')
+    
 class SearchResultsPageLocators(object):
 
     PRODUCT_CONTAINER = (By.CLASS_NAME, '_3YREj-P')

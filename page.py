@@ -41,6 +41,37 @@ class MainPage(BasePage):
             Error "ASOS" not in self.driver.title
         """
         return "ASOS" in self.driver.title
+    
+    def navigate_to_men(self):
+        """
+        This is a function to check is the name of the site is in the title of the webpage.
+
+        Args:
+            param1:self 
+
+        Returns:
+            clicks the mens section BUTTON
+        Raises:
+            
+        """
+        element = self.driver.find_element(*MainPageLocators.MEN_SECTION)
+        element.click()
+
+    def navigate_to_women(self):
+        """
+        This is a function to navigate to the womens section
+
+        Args:
+            param1:self 
+
+        Returns:
+            Clicks the womens section button
+
+        Raises:
+            Error "ASOS" not in self.driver.title
+        """
+        element = self.driver.find_element(*MainPageLocators.WOMEN_SECTION)
+        element.click()
 
     def click_search_bar(self):
         """
@@ -749,7 +780,7 @@ class ProductPage(BasePage):
         size_and_fit_list = []
         look_after_me_list = []
         about_me_list = []
-        
+        """
         buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
         for button in buttons:
             button.click()
@@ -782,8 +813,10 @@ class ProductPage(BasePage):
         print(frame)
         filename = (product_name.text)
         return(frame, filename)
+        """
+        #buttons = self.driver.find_element_by_xpath("//div[@aria-label='Any time']/div[@class='mn-hd-txt'][text()='Any time']")
+        buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
 
-        '''
         product_elements = {'product description':{'list': product_description_list,
                                                    'buttonXpathtxt': ProductPageLocators.PRODUCT_DESCRIPTION,
                                                    'morepageregex': '.*desc:(.*)'},
@@ -797,13 +830,15 @@ class ProductPage(BasePage):
                                                    'buttonXpathtxt': ProductPageLocators.ABOUT_ME},
                                                    }
         
-        element_list = keys(product_elements)
-        #for button in (*buttons list xpath)
+        element_list = product_elements.keys()
+
+        for button in buttons:
+            button.click()
         # grab the text for the button & delete that element from elelist
 
         #For any more elements add to unexpect list
         #for any thikng left in elelist append a NULL to the listpointer.list
-        '''
+        
     
 
 
