@@ -34,6 +34,7 @@ class ProductPageLocators(object):
     STUDENT_DISC_IFRAME = (By.XPATH, '//*[@id="chrome-main-content"]')
 
 #secondary product page locators
+    INGREDIENTS_BUTTON_CONTAINER = (By.XPATH, '//*[@id="ingredients-button"]')
     SECONDARY_BUTTONS = (By.ID, 'pdp-ssr-product-description')
     DETAILS_CLASS = (By.CLASS_NAME, 'PKnVT')
     BUTTONS = (By.CLASS_NAME, 'DuCNB')    

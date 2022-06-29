@@ -54,7 +54,7 @@ class MainPage(BasePage):
         Raises:
             
         """
-        element = self.driver.find_element(*MainPageLocators.MEN_SECTION)
+        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
         element.click()
 
     def navigate_to_women(self):
@@ -70,7 +70,7 @@ class MainPage(BasePage):
         Raises:
             Error "ASOS" not in self.driver.title
         """
-        element = self.driver.find_element(*MainPageLocators.WOMEN_SECTION)
+        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
         element.click()
 
     def click_search_bar(self):
@@ -215,7 +215,7 @@ class SearchResultPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
-        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located (SearchResultsPageLocators.LOAD_MORE))
+        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
         element.click()
 
 #Product page class containing methods occuring on the page of a product 
@@ -391,7 +391,7 @@ class ProductPage(BasePage):
     
     def scrape_links_on_multiple_product_pages(self, href_list):
         """
-        This is a function I created to scrape links on multiple products page types contained in one function.
+        This is a function I created to scrape links on multiple products page types contained in one function. Its the original iteration of my attempts to scrape product pages with buttons and aria labels
 
         Args:
             param1: self.
@@ -531,11 +531,12 @@ class ProductPage(BasePage):
     
     def chooze_page(self, UUID, i):
         try:
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.INGREDIENTS_BUTTON_CONTAINER))
+            frame, filename = self.scrape_mobile_pages(UUID, i)
+        except:
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
             frame, filename = self.scrape_primary_prodpage(UUID, i)
-        except:
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
-            frame, filename = self.scrape_buttons_pages(UUID, i)
+            
         return(frame, filename)
 
 
@@ -560,10 +561,11 @@ class ProductPage(BasePage):
             frame, filename = self.scrape_primary_prodpage(UUID, i)
         except:
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
-            try:
-                frame, filename = self.scrape_secondary_product_page(UUID, i)
-            except:
-                frame, filename = self.scrape_tertiary_product_page(UUID, i)
+            frame, filename = self.scrape_mobile_pages(UUID, i)
+            #try:
+            #    frame, filename = self.scrape_secondary_product_page(UUID, i)
+            #except:
+            #    frame, filename = self.scrape_tertiary_product_page(UUID, i)
         return(frame, filename)
         
 
@@ -780,26 +782,41 @@ class ProductPage(BasePage):
         size_and_fit_list = []
         look_after_me_list = []
         about_me_list = []
-        """
-        buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
-        for button in buttons:
-            button.click()
+        
+        #buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
+        #for button in buttons:
+        #    button.click()
             #text = button.get_attribute("aria-label")
-            if self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION):
-                product_description = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
-                product_description_list.append(product_description.text)
-            elif self.driver.find_element(*ProductPageLocators.BRAND):
-                brand = self.driver.find_element(*ProductPageLocators.BRAND)
-                brand_list.append(brand.text)
-            elif self.driver.find_element(*ProductPageLocators.SIZE_AND_FIT):
-                size_and_fit = self.driver.find_elements(*ProductPageLocators.SIZE_AND_FIT)
-                size_and_fit_list.append(size_and_fit)
-            elif self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME):
-                look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
-                look_after_me_list.append(look_after_me)
-            else :
-                about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
-                about_me_list.append(about_me.text)
+        try:
+            self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
+            product_description = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
+            product_description_list.append(product_description.text)
+        except:
+            product_description_list.append("NULL")
+        try:
+            self.driver.find_element(*ProductPageLocators.BRAND)
+            brand = self.driver.find_element(*ProductPageLocators.BRAND)
+            brand_list.append(brand.text)
+        except:
+            brand_list.append('NULL')
+        try:
+            self.driver.find_element(*ProductPageLocators.SIZE_AND_FIT)
+            size_and_fit = self.driver.find_elements(*ProductPageLocators.SIZE_AND_FIT)
+            size_and_fit_list.append(size_and_fit.text)
+        except:
+            size_and_fit_list.append('NULL')
+        try:
+            self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
+            look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
+            look_after_me_list.append(look_after_me.text)
+        except:
+            look_after_me_list.append('NULL')
+        try:
+            self.driver.find_element(*ProductPageLocators.ABOUT_ME)
+            about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
+            about_me_list.append(about_me.text)
+        except:
+            about_me_list.append('NULL')
 
         product_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
         size_info = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
@@ -809,12 +826,12 @@ class ProductPage(BasePage):
 
         prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
         self.switch_iframes()
-        frame = pd.DataFrame.from_dict(prod_dict, ignore_index=True)
+        frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
         filename = (product_name.text)
         return(frame, filename)
         """
-        #buttons = self.driver.find_element_by_xpath("//div[@aria-label='Any time']/div[@class='mn-hd-txt'][text()='Any time']")
+        ingredients_container = self.driver.find_element(*ProductPageLocators.INGREDIENTS_BUTTON_CONTAINER)
         buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
 
         product_elements = {'product description':{'list': product_description_list,
@@ -834,11 +851,17 @@ class ProductPage(BasePage):
 
         for button in buttons:
             button.click()
-        # grab the text for the button & delete that element from elelist
-
+            aria = button.get_attribute('aria-hidden="false"')
+            title = button.get_attribute('id')
+            #grab text from visible aria
+            #if title matches element in element_list then remove that items from element list
+            #and append text to relevant list
+            #for items left in element list
+            
+    
         #For any more elements add to unexpect list
-        #for any thikng left in elelist append a NULL to the listpointer.list
-        
+        #for any thing left in elelist append a NULL to the listpointer.list
+        """
     
 
 
@@ -893,7 +916,13 @@ class ProductPage(BasePage):
             frame, filename = self.assert_prod_page_type(i, UUID)
             self.save_dataframe_locally(frame, filename)
 
+    def scrape_buttons_pages(self, href_list):
 
+        for i in tqdm(href_list):
+            self.driver.get(i)
+            UUID = self.create_uuid()
+            frame, filename = self.chooze_page(i, UUID)
+            self.save_dataframe_locally(frame, filename)
 
 
 

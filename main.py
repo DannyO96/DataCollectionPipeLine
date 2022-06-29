@@ -23,7 +23,8 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-blink-features=AutomationControlled')
         #option.add_argument('--disable-modal-content')
         #option.add_argument('--headless')
-        option.add_argument('--disable-gpu')  
+        option.add_argument('--disable-gpu')
+        option.add_argument('aria-hidden="false"')  
         #option.add_argument("start-maximized")
         
 
@@ -92,7 +93,7 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = page.SearchResultPage.get_href_List(self)
         product_page = page.ProductPage(self.driver)
-        product_page.scrape_prod_pages(self.href_list)
+        product_page.scrape_buttons_pages(self.href_list)
 
     #Method to close the webdriver    
     def tearDown(self):
