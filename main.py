@@ -9,6 +9,7 @@ class AsosScraper(unittest.TestCase):
 
     #Method to initialize the chromedriver
     def setUp(self):
+
         option = webdriver.ChromeOptions()
         option.add_argument('--disable-notifications')
         option.add_argument('--disable-forms')
@@ -24,10 +25,8 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-modal-content')
         #option.add_argument('--headless')
         option.add_argument('--disable-gpu')
-        option.add_argument('aria-hidden="false"')  
-        #option.add_argument("start-maximized")
-        
-
+        #option.add_argument('--remote-debugging-port=9222')  
+    
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
         self.driver.get("https://www.asos.com/")
 
@@ -75,7 +74,8 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_links_on_multiple_product_pages(self.href_list)
 
-    def test_locally_save_data_prod_pages(self):
+    #Test to locally savce the dictionaries in the raw data folder
+    def est_locally_save_data_prod_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
@@ -85,7 +85,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-    def est_scrape_buttons_pages(self):
+    def test_scrape_buttons_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_men()
@@ -93,7 +93,7 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = page.SearchResultPage.get_href_List(self)
         product_page = page.ProductPage(self.driver)
-        product_page.scrape_buttons_pages(self.href_list)
+        product_page.scrape_prod_pages(self.href_list)
 
     #Method to close the webdriver    
     def tearDown(self):

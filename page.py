@@ -560,8 +560,11 @@ class ProductPage(BasePage):
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
             frame, filename = self.scrape_primary_prodpage(UUID, i)
         except:
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
-            frame, filename = self.scrape_mobile_pages(UUID, i)
+            try:
+                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+                frame, filename = self.scrape_altprod_pages(UUID, i)
+            except:
+                pass
             #try:
             #    frame, filename = self.scrape_secondary_product_page(UUID, i)
             #except:
@@ -763,9 +766,9 @@ class ProductPage(BasePage):
         filename = product_name
         return(frame, filename)
 
-    def scrape_mobile_pages(self, i ,UUID):
+    def scrape_altprod_pages(self, i ,UUID):
         """
-        This is a function to 
+        This is a function to scrape the 
         Args:
             param1: self
             param2: i - this is the href of the product
@@ -788,33 +791,33 @@ class ProductPage(BasePage):
         #    button.click()
             #text = button.get_attribute("aria-label")
         try:
-            self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
-            product_description = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION)
-            product_description_list.append(product_description.text)
+            #self.driver.find_element(ProductPageLocators.PRODUCT_DESCRIPTION)
+            product_description = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
+            product_description_list.append(product_description.get_attribute("textContent"))
         except:
             product_description_list.append("NULL")
         try:
-            self.driver.find_element(*ProductPageLocators.BRAND)
-            brand = self.driver.find_element(*ProductPageLocators.BRAND)
-            brand_list.append(brand.text)
+            #self.driver.find_element(ProductPageLocators.BRAND)
+            brand = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
+            brand_list.append(brand.get_attribute("textContent"))
         except:
             brand_list.append('NULL')
         try:
-            self.driver.find_element(*ProductPageLocators.SIZE_AND_FIT)
-            size_and_fit = self.driver.find_elements(*ProductPageLocators.SIZE_AND_FIT)
-            size_and_fit_list.append(size_and_fit.text)
+            #self.driver.find_element(ProductPageLocators.SIZE_AND_FIT)
+            size_and_fit = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
+            size_and_fit_list.append(size_and_fit.get_attribute("textContent"))
         except:
             size_and_fit_list.append('NULL')
         try:
-            self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
-            look_after_me = self.driver.find_element(*ProductPageLocators.LOOK_AFTER_ME)
-            look_after_me_list.append(look_after_me.text)
+            #self.driver.find_element(ProductPageLocators.LOOK_AFTER_ME)
+            look_after_me = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
+            look_after_me_list.append(look_after_me.get_attribute("textContent"))
         except:
             look_after_me_list.append('NULL')
         try:
-            self.driver.find_element(*ProductPageLocators.ABOUT_ME)
-            about_me = self.driver.find_element(*ProductPageLocators.ABOUT_ME)
-            about_me_list.append(about_me.text)
+            #self.driver.find_element(ProductPageLocators.ABOUT_ME)
+            about_me = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
+            about_me_list.append(about_me.get_attribute("textContent"))
         except:
             about_me_list.append('NULL')
 
@@ -914,14 +917,6 @@ class ProductPage(BasePage):
             self.driver.get(i)
             UUID = self.create_uuid()
             frame, filename = self.assert_prod_page_type(i, UUID)
-            self.save_dataframe_locally(frame, filename)
-
-    def scrape_buttons_pages(self, href_list):
-
-        for i in tqdm(href_list):
-            self.driver.get(i)
-            UUID = self.create_uuid()
-            frame, filename = self.chooze_page(i, UUID)
             self.save_dataframe_locally(frame, filename)
 
 

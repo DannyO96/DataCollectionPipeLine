@@ -16,6 +16,8 @@ After rethinking my page object model to improve the efficiency of my program i 
 
 The dataframes obtained from scraping are now saved in a folder with gallery images from the products page and these folders are saved in a date time sensitive manner to allow for analysis of product information over time. Its likely that we might want to make predictions based upon the data and being able to study the data over time allows for more accurate predictions.
 
+The asos product pages appear to have different instances when loaded by the webdriver although my code accounts for this one of the product page types takes considerably longer to scrape almost 10x as long so reducing this time complexity is my current focus. I have also encountered the out of stock page these appear to be removed relatively fast although its an exception that is not currently handled by my code.
+
 
 
 
