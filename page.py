@@ -54,7 +54,7 @@ class MainPage(BasePage):
         Raises:
             
         """
-        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
         element.click()
 
     def navigate_to_women(self):
@@ -70,7 +70,7 @@ class MainPage(BasePage):
         Raises:
             Error "ASOS" not in self.driver.title
         """
-        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
         element.click()
 
     def click_search_bar(self):
@@ -215,7 +215,7 @@ class SearchResultPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
-        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
         element.click()
 
 #Product page class containing methods occuring on the page of a product 
@@ -235,7 +235,7 @@ class ProductPage(BasePage):
             KeyError: Raises an exception.
         """
         try: 
-            element = WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT_CLOSE))
+            element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT_CLOSE))
             self.driver.execute_script("arguments[0].click();", element)
             print('discount closed')
         except Exception as ex:
@@ -388,9 +388,9 @@ class ProductPage(BasePage):
             #frame = frame.append(prod_dict, ignore_index=True)
         print(frame)
         return(frame)
-    
+    """    
     def scrape_links_on_multiple_product_pages(self, href_list):
-        """
+        
         This is a function I created to scrape links on multiple products page types contained in one function. Its the original iteration of my attempts to scrape product pages with buttons and aria labels
 
         Args:
@@ -402,7 +402,7 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
-        """
+        
 
         for i in tqdm(href_list):
             self.driver.get(i)
@@ -525,10 +525,10 @@ class ProductPage(BasePage):
                 except:
                     #self.switch_iframes()
                     print('lap')
-
+    """
                 #urllib to download image
                 #urllib.urlretrieve(src, "captcha.png")
-    
+    """
     def chooze_page(self, UUID, i):
         try:
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.INGREDIENTS_BUTTON_CONTAINER))
@@ -538,7 +538,7 @@ class ProductPage(BasePage):
             frame, filename = self.scrape_primary_prodpage(UUID, i)
             
         return(frame, filename)
-
+    """
 
     def assert_prod_page_type(self, UUID, i):
         """
@@ -555,9 +555,11 @@ class ProductPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
+        frame = 1
+        filename = 1
         
         try:
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+            WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
             frame, filename = self.scrape_primary_prodpage(UUID, i)
         except:
             try:
@@ -591,7 +593,7 @@ class ProductPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
-        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+        element = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
         element.click()
         print('clicked container')
         #self.close_alert()
@@ -612,23 +614,23 @@ class ProductPage(BasePage):
         uuid_list = []
         product_code_list = []
         size_info_list = []
-        imginfo_list = []
+        img_info_list = []
         product_details_list = []
         about_product_list = []
         price_info_list = []
 
         image_link_list.append(image_link)
-        #product_name_list.append(product_name.text)
+        product_name_list.append(product_name.text)
         uuid_list.append(UUID)
         product_code_list.append(product_code.text)
         size_info_list.append(size_info.text)
-        imginfo_list.append(img_info.text)
+        img_info_list.append(img_info.text)
         product_details_list.append(product_details.text)
         about_product_list.append(about_product.text)
         price_info_list.append(price_info.text)
         name = (product_name.text)
 
-        prod_dict = {'product_name': name,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
+        prod_dict = {'product_name': name,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info_list, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
         frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
         filename = name
@@ -649,7 +651,7 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
-        """
+        
 
         product_description_list = []
         brand_list = []
@@ -700,7 +702,7 @@ class ProductPage(BasePage):
         print(frame)
         filename = (product_name.text)
         return(frame, filename)
-        
+        """
 
     def scrape_tertiary_product_page(self, i, UUID):
         """
@@ -717,7 +719,7 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
-        """
+        
 
         product_description_list = []
         brand_list = []
@@ -765,6 +767,7 @@ class ProductPage(BasePage):
         print(frame)
         filename = product_name
         return(frame, filename)
+        """
 
     def scrape_altprod_pages(self, i ,UUID):
         """
@@ -792,31 +795,31 @@ class ProductPage(BasePage):
             #text = button.get_attribute("aria-label")
         try:
             #self.driver.find_element(ProductPageLocators.PRODUCT_DESCRIPTION)
-            product_description = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
+            product_description = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
             product_description_list.append(product_description.get_attribute("textContent"))
         except:
             product_description_list.append("NULL")
         try:
             #self.driver.find_element(ProductPageLocators.BRAND)
-            brand = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
+            brand = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
             brand_list.append(brand.get_attribute("textContent"))
         except:
             brand_list.append('NULL')
         try:
             #self.driver.find_element(ProductPageLocators.SIZE_AND_FIT)
-            size_and_fit = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
+            size_and_fit = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
             size_and_fit_list.append(size_and_fit.get_attribute("textContent"))
         except:
             size_and_fit_list.append('NULL')
         try:
             #self.driver.find_element(ProductPageLocators.LOOK_AFTER_ME)
-            look_after_me = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
+            look_after_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
             look_after_me_list.append(look_after_me.get_attribute("textContent"))
         except:
             look_after_me_list.append('NULL')
         try:
             #self.driver.find_element(ProductPageLocators.ABOUT_ME)
-            about_me = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
+            about_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
             about_me_list.append(about_me.get_attribute("textContent"))
         except:
             about_me_list.append('NULL')
@@ -911,11 +914,13 @@ class ProductPage(BasePage):
             in a folder in the raw data folder with the image and dataframe contained in the folder.
 
         Raises:
-            KeyError: Raises an exception.
+            TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label
         """
         for i in tqdm(href_list):
             self.driver.get(i)
             UUID = self.create_uuid()
+            if WebDriverWait(self.driver, 1 ).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
+                pass
             frame, filename = self.assert_prod_page_type(i, UUID)
             self.save_dataframe_locally(frame, filename)
 
