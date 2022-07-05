@@ -85,19 +85,31 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-    def test_scrape_buttons_pages(self):
+    def est_scrape_buttons_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        self.href_list = page.SearchResultPage.get_href_List(self)
+        self.href_list = page.SearchResultPage.get_href_list(self)
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
+    def test_scrape_multiple_results_pages(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.accept_cookies()
+        mainpage.navigate_to_men()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = page.SearchResultPage.get_href_list(self)
+        search_result_page.load_more_results()
+        self.href_list = page.SearchResultPage.get_href_list(self)
+        product_page = page.ProductPage(self.driver)
+        product_page.scrape_prod_pages(self.href_list)
+        
     #Method to close the webdriver    
     def tearDown(self):
-        self.driver.close
+        self.driver.close()
 
 
 if __name__ == "__main__":

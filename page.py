@@ -159,7 +159,7 @@ class SearchResultPage(BasePage):
         urllib.request.urlretrieve(url,fullname)     
     #download_images()
 
-    def get_href_List(self):
+    def get_href_list(self):
         """
         This is a function to generate a list of products links(hrefs)
 
@@ -215,7 +215,7 @@ class SearchResultPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
-        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
+        element = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
         element.click()
 
 #Product page class containing methods occuring on the page of a product 
@@ -794,32 +794,32 @@ class ProductPage(BasePage):
         #    button.click()
             #text = button.get_attribute("aria-label")
         try:
-            #self.driver.find_element(ProductPageLocators.PRODUCT_DESCRIPTION)
-            product_description = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
+            product_description = self.driver.find_element(ProductPageLocators.PRODUCT_DESCRIPTION)
+            #product_description = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
             product_description_list.append(product_description.get_attribute("textContent"))
         except:
             product_description_list.append("NULL")
         try:
-            #self.driver.find_element(ProductPageLocators.BRAND)
-            brand = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
+            brand = self.driver.find_element(ProductPageLocators.BRAND)
+            #brand = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
             brand_list.append(brand.get_attribute("textContent"))
         except:
             brand_list.append('NULL')
         try:
-            #self.driver.find_element(ProductPageLocators.SIZE_AND_FIT)
-            size_and_fit = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
+            size_and_fit = self.driver.find_element(ProductPageLocators.SIZE_AND_FIT)
+            #size_and_fit = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
             size_and_fit_list.append(size_and_fit.get_attribute("textContent"))
         except:
             size_and_fit_list.append('NULL')
         try:
-            #self.driver.find_element(ProductPageLocators.LOOK_AFTER_ME)
-            look_after_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
+            look_after_me = self.driver.find_element(ProductPageLocators.LOOK_AFTER_ME)
+            #look_after_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
             look_after_me_list.append(look_after_me.get_attribute("textContent"))
         except:
             look_after_me_list.append('NULL')
         try:
-            #self.driver.find_element(ProductPageLocators.ABOUT_ME)
-            about_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
+            about_me = self.driver.find_element(ProductPageLocators.ABOUT_ME)
+            #about_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
             about_me_list.append(about_me.get_attribute("textContent"))
         except:
             about_me_list.append('NULL')

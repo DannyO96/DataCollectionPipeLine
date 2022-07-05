@@ -18,8 +18,7 @@ The dataframes obtained from scraping are now saved in a folder with gallery ima
 
 The asos product pages appear to have different instances when loaded by the webdriver although my code accounts for this one of the product page types takes considerably longer to scrape almost 10x as long so reducing this time complexity is my current focus. I have also encountered the out of stock page these appear to be removed relatively fast although its an exception that is not currently handled by my code.
 
-
-
+Recently i have been attempting to reduce the runtime of the scraper by reducing the amount of actions and reducing the amount of time i spend waiting for elements to appear so far this has reduced the runtime of the longest instance of the scraPer by almost 80%
 
 
 '''
