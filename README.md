@@ -20,5 +20,7 @@ The asos product pages appear to have different instances when loaded by the web
 
 Recently i have been attempting to reduce the runtime of the scraper by reducing the amount of actions and reducing the amount of time i spend waiting for elements to appear so far this has reduced the runtime of the longest instance of the scraPer by almost 80%
 
+I have finally solved the out of stock page issue with a try and except block, if else statements and the selenium web elemnt module the scraper now skips out of stock products when scraping i have also used extend of the href list in order to scrape multiple search result pages of products
+
 
 '''

@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote.webelement import WebElement
 from locators import MainPageLocators
 from locators import ProductPageLocators
 from locators import SearchResultsPageLocators
@@ -794,32 +795,32 @@ class ProductPage(BasePage):
         #    button.click()
             #text = button.get_attribute("aria-label")
         try:
-            product_description = self.driver.find_element(ProductPageLocators.PRODUCT_DESCRIPTION)
-            #product_description = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
+            #product_description = self.driver.find_element(ProductPageLocators.PRODUCT_DESCRIPTION)
+            product_description = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
             product_description_list.append(product_description.get_attribute("textContent"))
         except:
             product_description_list.append("NULL")
         try:
-            brand = self.driver.find_element(ProductPageLocators.BRAND)
-            #brand = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
+            #brand = self.driver.find_element(ProductPageLocators.BRAND)
+            brand = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
             brand_list.append(brand.get_attribute("textContent"))
         except:
             brand_list.append('NULL')
         try:
-            size_and_fit = self.driver.find_element(ProductPageLocators.SIZE_AND_FIT)
-            #size_and_fit = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
+            #size_and_fit = self.driver.find_element(ProductPageLocators.SIZE_AND_FIT)
+            size_and_fit = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
             size_and_fit_list.append(size_and_fit.get_attribute("textContent"))
         except:
             size_and_fit_list.append('NULL')
         try:
-            look_after_me = self.driver.find_element(ProductPageLocators.LOOK_AFTER_ME)
-            #look_after_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
+            #look_after_me = self.driver.find_element(ProductPageLocators.LOOK_AFTER_ME)
+            look_after_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
             look_after_me_list.append(look_after_me.get_attribute("textContent"))
         except:
             look_after_me_list.append('NULL')
         try:
-            about_me = self.driver.find_element(ProductPageLocators.ABOUT_ME)
-            #about_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
+            #about_me = self.driver.find_element(ProductPageLocators.ABOUT_ME)
+            about_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
             about_me_list.append(about_me.get_attribute("textContent"))
         except:
             about_me_list.append('NULL')
@@ -918,11 +919,18 @@ class ProductPage(BasePage):
         """
         for i in tqdm(href_list):
             self.driver.get(i)
-            UUID = self.create_uuid()
-            if WebDriverWait(self.driver, 1 ).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
-                pass
-            frame, filename = self.assert_prod_page_type(i, UUID)
-            self.save_dataframe_locally(frame, filename)
+            try:
+                out_of_stock = self.driver.find_element(ProductPageLocators.OUT_OF_STOCK)
+                oos = WebElement.is_displayed(out_of_stock)
+            except:
+                oos = False
+            #if WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
+            if oos == True:
+                continue
+            else:
+                UUID = self.create_uuid()
+                frame, filename = self.assert_prod_page_type(i, UUID)
+                self.save_dataframe_locally(frame, filename)
 
 
 

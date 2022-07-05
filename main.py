@@ -17,7 +17,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-secure-containers')
         option.add_argument('--disable-same-origin')
         option.add_argument('--disable-secure-scripts')
-        option.add_argument("--window-size=1920,1080")
+        option.add_argument("-window-size=1920,1080")
         #option.add_argument("--disable-extensions")
         option.add_argument('--no-sandbox')
         #option.add_argument('--allow-insecure-localhost')
@@ -53,6 +53,7 @@ class AsosScraper(unittest.TestCase):
         mainPage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.image_link_list = page.SearchResultPage.get_image_links(self)
+        print(self.image_link_list)
 
     #Test to create a pd dataframe of product information
     def est_create_pd_dataframe(self):
@@ -101,15 +102,15 @@ class AsosScraper(unittest.TestCase):
         mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        self.href_list = page.SearchResultPage.get_href_list(self)
         search_result_page.load_more_results()
         self.href_list = page.SearchResultPage.get_href_list(self)
+        self.href_list.extend(self.href_list)
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
         
     #Method to close the webdriver    
     def tearDown(self):
-        self.driver.close()
+        self.driver.close
 
 
 if __name__ == "__main__":
