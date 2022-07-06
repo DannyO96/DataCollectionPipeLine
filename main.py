@@ -13,6 +13,7 @@ class AsosScraper(unittest.TestCase):
 
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         option = webdriver.ChromeOptions()
+
         option.add_argument('--disable-notifications')
         option.add_argument('--disable-forms')
         option.add_argument('--disable-scripts')
@@ -26,7 +27,7 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-blink-features=AutomationControlled')
         option.add_argument(f'user-agent={user_agent}')
         option.add_argument('--disable-dev-shm-usage')
-        option.add_argument('--headless')
+        #option.add_argument('--headless')
         option.add_argument('--disable-gpu')
         #option.add_argument('--remote-debugging-port=9222')  
     
@@ -99,7 +100,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-    def est_scrape_multiple_results_pages(self):
+    def test_scrape_multiple_results_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_men()
@@ -111,7 +112,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-    def test_get_headless(self):
+    def est_get_headless(self):
         mainpage = page.MainPage(self.driver)
         #mainpage.search_asos()
         mainpage.headless_accept_cookies()

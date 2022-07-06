@@ -943,22 +943,37 @@ class ProductPage(BasePage):
             in a folder in the raw data folder with the image and dataframe contained in the folder.
 
         Raises:
-            TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label
+            TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label or a something gone wrong label
         """
         for i in tqdm(href_list):
             self.driver.get(i)
             try:
-                out_of_stock = self.driver.find_element(ProductPageLocators.OUT_OF_STOCK)
+                out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
                 oos = WebElement.is_displayed(out_of_stock)
+                something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
+                sgw = WebElement.is_displayed(something_gone_wrong)
             except:
                 oos = False
+                sgw = False
             #if WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
-            if oos == True:
+            if oos == True or sgw == True:
                 continue
             else:
                 UUID = self.create_uuid()
-                frame, filename = self.assert_prod_page_type(i, UUID)
-                self.save_dataframe_locally(frame, filename)
+                print('uuid created')
+            try:
+                out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
+                oos = WebElement.is_displayed(out_of_stock)
+                something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
+                sgw = WebElement.is_displayed(something_gone_wrong)
+            except:
+                oos = False
+                sgw = False
+            #if WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
+            if oos == True or sgw == True:
+                continue
+            frame, filename = self.assert_prod_page_type(i, UUID)
+            self.save_dataframe_locally(frame, filename)
 
 
 

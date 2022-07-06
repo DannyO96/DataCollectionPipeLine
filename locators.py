@@ -53,5 +53,6 @@ class ProductPageLocators(object):
     LOOK_AFTER_ME_BUTTTON2 = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[3]/div/h3/button')
     ABOUT_ME_BUTTON2 = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[4]/div/h3/button')
 
-#OOS product page locators
+#problem product page locators
     OUT_OF_STOCK = (By.XPATH, '//*[@id="oos-label"]/h3')
+    SOMETHING_GONE_WRONG = (By.XPATH, '//*[@id="aside-content-retry"]/div/div/a/span')
