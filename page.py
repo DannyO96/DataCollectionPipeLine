@@ -5,7 +5,6 @@ import pandas as pd
 import urllib.request
 import selenium
 import requests
-from bs4 import BeautifulSoup
 from slugify import slugify
 from datetime import datetime
 from selenium import webdriver
@@ -47,7 +46,7 @@ class MainPage(BasePage):
     
     def print_page_source(self):
         """
-        This is a function to print out the source html of the page im using the functions to understand 
+        This is a function to print out the source html of the page im using, essentially its the function that helps to understand 
         why headless mode isnt working correctly
         """
         
@@ -961,17 +960,6 @@ class ProductPage(BasePage):
             else:
                 UUID = self.create_uuid()
                 print('uuid created')
-            try:
-                out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
-                oos = WebElement.is_displayed(out_of_stock)
-                something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
-                sgw = WebElement.is_displayed(something_gone_wrong)
-            except:
-                oos = False
-                sgw = False
-            #if WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
-            if oos == True or sgw == True:
-                continue
             frame, filename = self.assert_prod_page_type(i, UUID)
             self.save_dataframe_locally(frame, filename)
 

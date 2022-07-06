@@ -100,7 +100,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-    def test_scrape_multiple_results_pages(self):
+    def est_scrape_multiple_results_pages(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_men()
@@ -112,14 +112,18 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
-    def est_get_headless(self):
+    def test_scrape_lots_of_prods(self):
         mainpage = page.MainPage(self.driver)
         #mainpage.search_asos()
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
+        search_result_page.load_more_results()
+        search_result_page.load_more_results()
         self.href_list = page.SearchResultPage.get_href_list(self)
+        self.href_list.extend(self.href_list)
+        self.href_list.extend(self.href_list)
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
         
