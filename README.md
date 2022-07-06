@@ -22,5 +22,6 @@ Recently i have been attempting to reduce the runtime of the scraper by reducing
 
 I have finally solved the out of stock page issue with a try and except block, if else statements and the selenium web elemnt module the scraper now skips out of stock products when scraping i have also used extend of the href list in order to scrape multiple search result pages of products
 
+I have got headless mode working it wasnt working as i was using the default user agent setting the user agent in my setUp function solved issues i was having with headless mode
 
 '''

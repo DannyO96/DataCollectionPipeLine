@@ -4,6 +4,8 @@ import uuid
 import pandas as pd
 import urllib.request
 import selenium
+import requests
+from bs4 import BeautifulSoup
 from slugify import slugify
 from datetime import datetime
 from selenium import webdriver
@@ -43,6 +45,27 @@ class MainPage(BasePage):
         """
         return "ASOS" in self.driver.title
     
+    def print_page_source(self):
+        """
+        This is a function to print out the source html of the page im using the functions to understand 
+        why headless mode isnt working correctly
+        """
+        
+        url = ('https://www.asos.com/')
+        #source = requests.get(url)
+        #html = source.text
+        #soup = BeautifulSoup(html, "html.parser")
+        #print(soup.body)
+
+        headers = {
+            'User-Agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36",
+            'Content-Type': 'text/html',
+        }
+
+        response = requests.get(url, headers=headers)
+        html = response.text
+        print(html)
+
     def navigate_to_men(self):
         """
         This is a function to check is the name of the site is in the title of the webpage.
@@ -105,6 +128,11 @@ class MainPage(BasePage):
         element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
         
+    def headless_accept_cookies(self):
+        self.driver.delete_all_cookies()
+        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        element.click()
+        print("cookies accepted")
 
     def search_asos(self):
         """
@@ -887,7 +915,7 @@ class ProductPage(BasePage):
             the dataframe in json format.
 
         Raises:
-            KeyError: Raises an exception.
+            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the
         """
         #filename = product_name.text
         new_filename = slugify(filename)
