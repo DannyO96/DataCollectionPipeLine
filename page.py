@@ -864,40 +864,6 @@ class ProductPage(BasePage):
         print(frame)
         filename = (product_name.text)
         return(frame, filename)
-        """
-        ingredients_container = self.driver.find_element(*ProductPageLocators.INGREDIENTS_BUTTON_CONTAINER)
-        buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
-
-        product_elements = {'product description':{'list': product_description_list,
-                                                   'buttonXpathtxt': ProductPageLocators.PRODUCT_DESCRIPTION,
-                                                   'morepageregex': '.*desc:(.*)'},
-                                          'brand':{'list': brand_list,
-                                                   'buttonXpathtxt': ProductPageLocators.BRAND,},
-                                     'size & fit':{'list': size_and_fit_list,
-                                                   'buttonXpathtxt': ProductPageLocators.SIZE_AND_FIT},
-                                  'look after me':{'list': look_after_me_list,
-                                                   'buttonXpathtxt': ProductPageLocators.LOOK_AFTER_ME},
-                                       'about me':{'list': about_me_list,
-                                                   'buttonXpathtxt': ProductPageLocators.ABOUT_ME},
-                                                   }
-        
-        element_list = product_elements.keys()
-
-        for button in buttons:
-            button.click()
-            aria = button.get_attribute('aria-hidden="false"')
-            title = button.get_attribute('id')
-            #grab text from visible aria
-            #if title matches element in element_list then remove that items from element list
-            #and append text to relevant list
-            #for items left in element list
-            
-    
-        #For any more elements add to unexpect list
-        #for any thing left in elelist append a NULL to the listpointer.list
-        """
-    
-
 
     def save_dataframe_locally(self, frame, filename):
         """
@@ -951,21 +917,20 @@ class ProductPage(BasePage):
                 oos = WebElement.is_displayed(out_of_stock)
                 something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
                 sgw = WebElement.is_displayed(something_gone_wrong)
-                #container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-                #desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
-                #scrapable = WebElement.is_displayed(container) or WebElement.is_displayed(desc_button)
+                container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
+                scrapable = WebElement.is_displayed(container) or WebElement.is_displayed(desc_button)
             except:
                 scrapable = True
                 oos = False
                 sgw = False
-            #if WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
-            if oos == True or sgw == True: #or scrapable == False:
+            if oos == True or sgw == True or scrapable == False:
                 continue
             else:
                 UUID = self.create_uuid()
                 print('uuid created')
-            frame, filename = self.assert_prod_page_type(i, UUID)
-            self.save_dataframe_locally(frame, filename)
+                frame, filename = self.assert_prod_page_type(i, UUID)
+                self.save_dataframe_locally(frame, filename)
 
 
 
