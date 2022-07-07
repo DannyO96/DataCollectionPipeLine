@@ -1,4 +1,3 @@
-from cgitb import html
 import unittest
 import page
 import time

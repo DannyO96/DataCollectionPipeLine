@@ -951,11 +951,15 @@ class ProductPage(BasePage):
                 oos = WebElement.is_displayed(out_of_stock)
                 something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
                 sgw = WebElement.is_displayed(something_gone_wrong)
+                #container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                #desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
+                #scrapable = WebElement.is_displayed(container) or WebElement.is_displayed(desc_button)
             except:
+                scrapable = True
                 oos = False
                 sgw = False
             #if WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.OUT_OF_STOCK)):
-            if oos == True or sgw == True:
+            if oos == True or sgw == True: #or scrapable == False:
                 continue
             else:
                 UUID = self.create_uuid()
