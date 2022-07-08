@@ -912,18 +912,29 @@ class ProductPage(BasePage):
         """
         for i in tqdm(href_list):
             self.driver.get(i)
+            
             try:
-                out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
-                oos = WebElement.is_displayed(out_of_stock)
-                something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
-                sgw = WebElement.is_displayed(something_gone_wrong)
-                container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-                desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
-                scrapable = WebElement.is_displayed(container) or WebElement.is_displayed(desc_button)
+                try:
+                    out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
+                    oos = WebElement.is_displayed(out_of_stock)
+                except *exception*:
+                    oos=False
+                try:
+                    something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
+                    sgw = WebElement.is_displayed(something_gone_wrong)
+                except *exception*:
+                    sgw=False
+                try:
+                    container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                    desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
+                    scrapable = WebElement.is_displayed(container) or WebElement.is_displayed(desc_button)
+                except *exception*:
+                    scrapable=False
             except:
-                scrapable = True
-                oos = False
-                sgw = False
+                print something about the exception.
+                scrapable=False
+            
+
             if oos == True or sgw == True or scrapable == False:
                 continue
             else:
