@@ -49,13 +49,7 @@ class MainPage(BasePage):
         This is a function to print out the source html of the page im using, essentially its the function that helps to understand 
         why headless mode isnt working correctly
         """
-        
         url = ('https://www.asos.com/')
-        #source = requests.get(url)
-        #html = source.text
-        #soup = BeautifulSoup(html, "html.parser")
-        #print(soup.body)
-
         headers = {
             'User-Agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36",
             'Content-Type': 'text/html',
@@ -180,12 +174,6 @@ class SearchResultPage(BasePage):
                 image_links.append(image_link)
         print(image_links)
         return(image_links)
-
-    #def download_images(url):
-    #    name = "no"
-        fullname = str(name)+".jpg"
-        urllib.request.urlretrieve(url,fullname)     
-    #download_images()
 
     def get_href_list(self):
         """
@@ -338,11 +326,10 @@ class ProductPage(BasePage):
         This is an example of Google style.
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
+            param1: self
 
         Returns:
-            This is a description of what is returned.
+            A unique user id is created and returned
 
         Raises:
             KeyError: Raises an exception.
@@ -652,7 +639,7 @@ class ProductPage(BasePage):
                     pdb = False
                 scrapable = pdc or pdb 
             except Exception as E:
-                print('something nice', E)
+                print('Exception: ', E)
             print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
 
             if oos == True or sgw == True or scrapable == False:
@@ -664,6 +651,8 @@ class ProductPage(BasePage):
                 print('uuid created')
                 frame, filename = self.assert_prod_page_type(i, UUID)
                 self.save_dataframe_locally(frame, filename)
+        
+    
 
 
 

@@ -16,8 +16,6 @@ class SearchResultsPageLocators(object):
     LOAD_MORE = (By.CLASS_NAME, "_39_qNys")
 
 class ProductPageLocators(object):
-    #self.elements = {define:
-    #}
 #primary product page 
     GALLERY_IMAGE = (By.XPATH, '//*[@id="product-gallery"]/div[2]/div[2]/div[2]/img')
     PRODUCT_NAME = (By.XPATH, '//*[@id="aside-content"]/div[1]/h1')
@@ -33,7 +31,7 @@ class ProductPageLocators(object):
     STUDENT_DISCOUNT_CLOSE = (By.XPATH, '//*[@id="att_lightbox_close"]/svg/path')
     STUDENT_DISC_IFRAME = (By.XPATH, '//*[@id="chrome-main-content"]')
 
-#secondary product page locators
+#Alternate product page locators
     INGREDIENTS_BUTTON_CONTAINER = (By.XPATH, '//*[@id="ingredients-button"]')
     SECONDARY_BUTTONS = (By.ID, 'pdp-ssr-product-description')
     DETAILS_CLASS = (By.CLASS_NAME, 'PKnVT')
@@ -48,10 +46,6 @@ class ProductPageLocators(object):
     LOOK_AFTER_ME = (By.XPATH, '//*[@id="productDescriptionCareInfo"]')
     ABOUT_ME_BUTTON = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[5]/div/h3/button')
     ABOUT_ME = (By.XPATH, '//*[@id="productDescriptionAboutMe"]')
-
-#Tertiary product page locators
-    LOOK_AFTER_ME_BUTTTON2 = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[3]/div/h3/button')
-    ABOUT_ME_BUTTON2 = (By.XPATH, '//*[@id="pdp-ssr-product-description"]/div/ul/li[4]/div/h3/button')
 
 #problem product page locators
     OUT_OF_STOCK = (By.XPATH, '//*[@id="oos-label"]/h3')
