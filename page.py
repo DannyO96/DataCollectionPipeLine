@@ -917,26 +917,32 @@ class ProductPage(BasePage):
                 try:
                     out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
                     oos = WebElement.is_displayed(out_of_stock)
-                except *exception*:
+                except selenium.common.exceptions.NoSuchElementException:
                     oos=False
                 try:
                     something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
                     sgw = WebElement.is_displayed(something_gone_wrong)
-                except *exception*:
+                except selenium.common.exceptions.NoSuchElementException:
                     sgw=False
                 try:
                     container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                    pdc = WebElement.is_displayed(container)
+                except selenium.common.exceptions.NoSuchElementException:
+                    pdc = False
+                try:
                     desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
-                    scrapable = WebElement.is_displayed(container) or WebElement.is_displayed(desc_button)
-                except *exception*:
-                    scrapable=False
-            except:
-                print something about the exception.
-                scrapable=False
-            
+                    pdb = WebElement.is_displayed(desc_button)
+                except selenium.common.exceptions.NoSuchElementException:
+                    pdb = False
+                scrapable = pdc or pdb 
+            except Exception as E:
+                print('something nice', E)
+            print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
 
             if oos == True or sgw == True or scrapable == False:
+                print('something wrong')
                 continue
+            
             else:
                 UUID = self.create_uuid()
                 print('uuid created')
