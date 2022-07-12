@@ -323,16 +323,13 @@ class ProductPage(BasePage):
 
     def create_uuid(self):
         """
-        This is an example of Google style.
-
+        This function creates a unique user id and returns it.
         Args:
-            param1: self
-
+            param1: self.
         Returns:
-            A unique user id is created and returned
-
+            A unique user id is created and returned.
         Raises:
-            KeyError: Raises an exception.
+            
         """
         UUID = str(uuid.uuid4())
         return UUID
@@ -343,11 +340,11 @@ class ProductPage(BasePage):
         successfully.
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
+            param1: self.
+            param2: href_list, this is a list of links to product pages.
 
         Returns:
-            This is a description of what is returned.
+            Tis function returns a pandas dataframe.
 
         Raises:
             KeyError: Raises an exception.
@@ -611,7 +608,8 @@ class ProductPage(BasePage):
             in a folder in the raw data folder with the image and dataframe contained in the folder.
 
         Raises:
-            TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label or a something gone wrong label
+            TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label or a something gone wrong label although try and accept blocks 
+            have now been implemented to avoid this error.
         """
         for i in tqdm(href_list):
             self.driver.get(i)
