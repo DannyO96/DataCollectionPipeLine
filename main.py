@@ -101,14 +101,14 @@ class AsosScraper(unittest.TestCase):
         product_page.scrape_prod_pages(self.href_list)
     
     def test_upload_raw_data_to_s3(self):
-        #mainpage = page.MainPage(self.driver)
-        #mainpage.headless_accept_cookies()
-        #mainpage.navigate_to_men()
-        #mainpage.search_asos()
-        #search_result_page = page.SearchResultPage(self.driver)
-        #self.href_list = search_result_page.get_href_list()
-        #product_page = page.ProductPage(self.driver)
-        #product_page.scrape_prod_pages(self.href_list)
+        mainpage = page.MainPage(self.driver)
+        mainpage.headless_accept_cookies()
+        mainpage.navigate_to_men()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = search_result_page.get_href_list()
+        product_page = page.ProductPage(self.driver)
+        product_page.scrape_prod_pages(self.href_list)
         store_data = data_storage.StoreData(self.s3_params)
         store_data.upload_raw_data_to_datalake()
         
