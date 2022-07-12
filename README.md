@@ -25,4 +25,6 @@ I have finally solved the out of stock page issue with a try and except block, i
 I have got headless mode working it wasnt working as i was using the default user agent setting the user agent in my setUp function solved issues i was having with headless mode
 
 I have finally got the error handling for out of stock something went wrong and outlets pages so the scraper can run without errors due to unscrapable product pages.
+
+After setting up my s3 bucket and RDS I have created methods to upload the contents of the raw data folder to my s3 bucket.
 '''
