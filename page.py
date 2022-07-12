@@ -18,10 +18,14 @@ from locators import SearchResultsPageLocators
 from element import BasePageElement
 from tqdm import tqdm
 
-
-#The parent Page class containing general page object methods
+"""
+I have separated methods for scraping in a page object model meaning each page object contains methods 
+relevant to scraping that type of page on my chosen website.
+"""
 class BasePage(object):
-
+    """
+    This is the base page class it instanciates the webdriver and its method is inherited by every page class
+    """
     def __init__(self, driver):
         self.driver = driver
 
