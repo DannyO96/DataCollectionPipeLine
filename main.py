@@ -2,6 +2,7 @@ import unittest
 import page
 import data_storage
 import time
+import json
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -27,11 +28,16 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-blink-features=AutomationControlled')
         option.add_argument(f'user-agent={user_agent}')
         option.add_argument('--disable-dev-shm-usage')
-        #option.add_argument('--headless')
+        option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
     
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
         self.driver.get("https://www.asos.com/")
+
+        # JSON file for s3 bucket credentials
+        f = open ('my.secrets.AWSbucket.json', "r")
+        self.s3_params = json.loads(f.read())
+            
 
     #Test that we are on the webpage
     def est_title(self):
@@ -95,16 +101,16 @@ class AsosScraper(unittest.TestCase):
         product_page.scrape_prod_pages(self.href_list)
     
     def test_upload_raw_data_to_s3(self):
-        mainpage = page.MainPage(self.driver)
-        mainpage.headless_accept_cookies()
-        mainpage.navigate_to_men()
-        mainpage.search_asos()
-        search_result_page = page.SearchResultPage(self.driver)
-        self.href_list = search_result_page.get_href_list()
-        product_page = page.ProductPage(self.driver)
-        product_page.scrape_prod_pages(self.href_list)
-        store_data = data_storage.StoreData
-        store_data.upload_raw_data_to_datalake(self)
+        #mainpage = page.MainPage(self.driver)
+        #mainpage.headless_accept_cookies()
+        #mainpage.navigate_to_men()
+        #mainpage.search_asos()
+        #search_result_page = page.SearchResultPage(self.driver)
+        #self.href_list = search_result_page.get_href_list()
+        #product_page = page.ProductPage(self.driver)
+        #product_page.scrape_prod_pages(self.href_list)
+        store_data = data_storage.StoreData(self.s3_params)
+        store_data.upload_raw_data_to_datalake()
         
     #Method to close the webdriver    
     def tearDown(self):
