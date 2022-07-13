@@ -35,8 +35,12 @@ class AsosScraper(unittest.TestCase):
         self.driver.get("https://www.asos.com/")
 
         # JSON file for s3 bucket credentials
-        f = open ('my.secrets.AWSbucket.json', "r")
+        f = open('my.secrets.AWSbucket.json', "r")
         self.s3_params = json.loads(f.read())
+        
+        #JSON file for RDS credentials
+        f = open('my.secrets.RDSdb.json', "r")
+        self.rds_params = json.loads(f.read())
             
 
     #Test that we are on the webpage
@@ -100,7 +104,8 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
     
-    def test_upload_raw_data_to_s3(self):
+    #Test to fill and upload the raw_data folder to an amazon s3 bucket
+    def est_upload_raw_data_to_s3(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -111,7 +116,21 @@ class AsosScraper(unittest.TestCase):
         product_page.scrape_prod_pages(self.href_list)
         store_data = data_storage.StoreData(self.s3_params)
         store_data.upload_raw_data_to_datalake()
-        
+
+    #test to upload a single dataframe to my relational database
+    def test_upload_frame_to_rds(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.headless_accept_cookies()
+        mainpage.navigate_to_men()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = search_result_page.get_href_list()
+        product_page = page.ProductPage(self.driver)
+        self.frame, self.filename = product_page.test_rds_upload(self.href_list)
+        data_store = data_storage.StoreData(self.rds_params)
+        data_store.process_data(self.frame, self.filename)
+
+
     #Method to close the webdriver    
     def tearDown(self):
         self.driver.close()

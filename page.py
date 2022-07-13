@@ -5,6 +5,7 @@ import pandas as pd
 import urllib.request
 import selenium
 import requests
+import data_storage
 from slugify import slugify
 from datetime import datetime
 from selenium import webdriver
@@ -16,6 +17,7 @@ from locators import MainPageLocators
 from locators import ProductPageLocators
 from locators import SearchResultsPageLocators
 from element import BasePageElement
+from data_storage import StoreData
 from tqdm import tqdm
 
 """
@@ -568,7 +570,8 @@ class ProductPage(BasePage):
         print(frame)
         filename = (product_name.text)
         return(frame, filename)
-
+    
+    
     def save_dataframe_locally(self, frame, filename):
         """
         This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
@@ -597,6 +600,9 @@ class ProductPage(BasePage):
         img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
         image_link = img_tag.get_attribute('src')
         urllib.request.urlretrieve(image_link, filepath2)
+
+        return frame, new_filename
+
 
 
     def scrape_prod_pages(self, href_list):
@@ -654,9 +660,17 @@ class ProductPage(BasePage):
                 frame, filename = self.assert_prod_page_type(i, UUID)
                 self.save_dataframe_locally(frame, filename)
         
-    
-
-
+    def test_rds_upload(self, href_list):
+        for i in tqdm(href_list):
+            pass
+        self.driver.get(i)
+        UUID = self.create_uuid()
+        print('uuid created')
+        self.frame, self.filename = self.assert_prod_page_type(i, UUID)
+        frame,filename = self.save_dataframe_locally(self.frame, self.filename)
+        frame, filename 
+        return(frame, filename)
+        
 
 
 
