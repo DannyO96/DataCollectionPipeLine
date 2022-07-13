@@ -27,4 +27,7 @@ I have got headless mode working it wasnt working as i was using the default use
 I have finally got the error handling for out of stock something went wrong and outlets pages so the scraper can run without errors due to unscrapable product pages.
 
 After setting up my s3 bucket and RDS I have created methods to upload the contents of the raw data folder to my s3 bucket.
+
+I have written a test to upload a single dataframe to my database and confirmed it in a terminal window connected to the database however i will need to
+do some more work to ensure all the data is as i expect and ready for analysis and manipulation
 '''

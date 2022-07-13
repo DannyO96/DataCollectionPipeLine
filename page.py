@@ -601,7 +601,7 @@ class ProductPage(BasePage):
         image_link = img_tag.get_attribute('src')
         urllib.request.urlretrieve(image_link, filepath2)
 
-        return frame, new_filename
+        return frame, new_filename 
 
 
 
