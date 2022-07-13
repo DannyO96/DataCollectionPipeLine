@@ -24,14 +24,14 @@ class StoreData():
         self.aws_secret_access_key = s3_params['aws_secret_access_key']
         self.s3_client = boto3.client("s3")
 
-        self.rds_params = {"database_type":self.database_type}
+        self.rds_params = {"database_type":self.database_type, "dbapi":self.dbapi, "endpoint":self.endpoint, "user":self.user, "password":self.password, "database":self.database, "port":self.port}
         #self.database_type = rds_params["database_type"]
-        self.dbapi = rds_params["dbapi"]
-        self.endpoint = rds_params["endpoint"]
-        self.user = rds_params["user"]
-        self.password = rds_params["password"]
-        self.database = rds_params["database"]
-        self.port = rds_params["port"]
+        #self.dbapi = rds_params["dbapi"]
+        #self.endpoint = rds_params["endpoint"]
+        #self.user = rds_params["user"]
+        #self.password = rds_params["password"]
+        #self.database = rds_params["database"]
+        #self.port = rds_params["port"]
 
 
     def upload_raw_data_to_datalake(self):
@@ -50,7 +50,6 @@ class StoreData():
 
         """
         path = '/home/danny/git/DataCollectionPipeline/raw_data/'
-        #bucket_name = ['asoss3bucket']
         try:
             #response = self.s3_client.upload_file(os.path.join(path,'testfile'), self.bucket_name, "testfile")
             for root,dirs,files in os.walk(path):
