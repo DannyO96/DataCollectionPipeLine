@@ -571,6 +571,26 @@ class ProductPage(BasePage):
         filename = (product_name.text)
         return(frame, filename)
     
+    def format_filename(self, filename):
+        """
+        This is a function to turn the name of the file in to a system date time stamped slug ready to be save locally or on the cloud
+
+        Args:
+            param1: self
+            param2: filename - this is the name of the product file before processing
+
+        Returns:
+            This function reeturns the filename ready to be save locally or on the cloud without issues
+
+        Raises:
+            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the
+        """
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        new_filename = slugify(filename)
+        newest_filename = new_filename + sys_dtime
+        return(newest_filename)
+        
+
     
     def save_dataframe_locally(self, frame, filename):
         """
@@ -579,7 +599,7 @@ class ProductPage(BasePage):
         Args:
             param1: self
             param2: frame - this is the dataframe returned from scraping one of the types of product page
-            param3: filename - this is the name of the product
+            param3: filename - this is the name of the product file
 
         Returns:
             This returns a folder in the raw_data folder where the name of the product is turned into a slug so it can be used as a foldername the foldername also incoperates 
@@ -601,9 +621,36 @@ class ProductPage(BasePage):
         image_link = img_tag.get_attribute('src')
         urllib.request.urlretrieve(image_link, filepath2)
 
-        return frame, new_filename 
+        return (frame, new_filename)
 
+    def save_dataframe_and_image_locally(self, frame, filename):
+        """
+        This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
 
+        Args:
+            param1: self
+            param2: frame - this is the dataframe returned from scraping one of the types of product page
+            param3: filename - this is the name of the product file
+
+        Returns:
+            This returns a folder in the raw_data folder where the name of the product is turned into a slug so it can be used as a foldername the foldername also incoperates 
+            sys dtime to avoid duplicate folders and allow for time period analysis of the data. The folder returned is named after the product and contains the gallery image jpeg and
+            the dataframe in json format.
+
+        Raises:
+            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the
+        """
+        #filename = product_name.text
+        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}")
+        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}")
+        filepath = os.path.join(folder, f"{filename}.json")
+        frame.to_json(filepath, orient = 'table', default_handler=str)
+        filepath2 = os.path.join(folder, f"{filename}.jpeg")
+        img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
+        image_link = img_tag.get_attribute('src')
+        urllib.request.urlretrieve(image_link, filepath2)
+
+        return (frame, filename)
 
     def scrape_prod_pages(self, href_list):
         """
@@ -657,8 +704,10 @@ class ProductPage(BasePage):
             else:
                 UUID = self.create_uuid()
                 print('uuid created')
-                frame, filename = self.assert_prod_page_type(i, UUID)
-                self.save_dataframe_locally(frame, filename)
+                self.frame, self.filename = self.assert_prod_page_type(i, UUID)
+                frame, filename = self.save_dataframe_locally(self.frame, self.filename)
+            return(frame, filename)
+            
         
     def test_rds_upload(self, href_list):
         for i in tqdm(href_list):
@@ -666,9 +715,9 @@ class ProductPage(BasePage):
         self.driver.get(i)
         UUID = self.create_uuid()
         print('uuid created')
-        self.frame, self.filename = self.assert_prod_page_type(i, UUID)
-        frame,filename = self.save_dataframe_locally(self.frame, self.filename)
-        frame, filename 
+        frame, self.filename = self.assert_prod_page_type(i, UUID)
+        filename = self.format_filename(self.filename)
+        self.save_dataframe_and_image_locally(frame, filename)
         return(frame, filename)
         
 

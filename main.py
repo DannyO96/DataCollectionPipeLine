@@ -130,6 +130,16 @@ class AsosScraper(unittest.TestCase):
         data_store = data_storage.StoreData(self.rds_params)
         data_store.process_data(self.frame, self.filename)
 
+    #test to upload 1 search result page of scraped data to my relational database
+    def est_upload_frames_to_rds(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.headless_accept_cookies()
+        mainpage.navigate_to_men()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = search_result_page.get_href_list()
+        product_page = page.ProductPage(self.driver)
+        
 
     #Method to close the webdriver    
     def tearDown(self):

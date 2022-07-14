@@ -9,6 +9,7 @@ import sqlalchemy
 import pandas
 import psycopg2
 import psycopg
+from locators import ProductPageLocators
 
 class StoreData():
     """
@@ -62,11 +63,6 @@ class StoreData():
             print("test upload 2 s3 exception",E)
             return False
 
-
-    def upload_raw_data_s3(self):
-        # Let's use Amazon S3
-        s3 = boto3.resource("s3")
-
     def create_engine(self):
         engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
         return engine
@@ -76,7 +72,7 @@ class StoreData():
         The dataframe is converted to sql
         """
         engine = self.create_engine()
-        frame.to_sql('Every_item', con=engine, if_exists='append', index=filename)
+        frame.to_sql('products', con=engine, if_exists='append', index=sqlalchemy.false)
         
 
     def process_data(self, frame, filename):
