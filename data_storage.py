@@ -72,11 +72,12 @@ class StoreData():
         The dataframe is converted to sql
         """
         engine = self.create_engine()
-        frame.to_sql('products', con=engine, if_exists='append', index=sqlalchemy.false)
+        frame.to_sql('products2', con=engine, if_exists='append', index=sqlalchemy.false)
         
 
     def process_data(self, frame, filename):
         """
         The dataframe is uloaded to rds
         """
+        frame.insert(0, "filename",filename)
         self.send_dataframe_to_rds(frame, filename)
