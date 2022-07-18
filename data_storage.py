@@ -67,17 +67,17 @@ class StoreData():
         engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
         return engine
 
-    def send_dataframe_to_rds(self, frame, filename):
+    def send_dataframe_to_rds(self, frame):
         """
         The dataframe is converted to sql
         """
         engine = self.create_engine()
-        frame.to_sql('products2', con=engine, if_exists='append', index=sqlalchemy.false)
+        frame.to_sql('products_test5', con=engine, if_exists='append', index=sqlalchemy.false)
         
 
-    def process_data(self, frame, filename):
+    def process_data(self, frame):
         """
         The dataframe is uloaded to rds
         """
-        frame.insert(0, "filename",filename)
-        self.send_dataframe_to_rds(frame, filename)
+        #frame.insert(0, "filename",filename)
+        self.send_dataframe_to_rds(frame)

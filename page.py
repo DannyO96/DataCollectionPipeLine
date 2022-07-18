@@ -5,6 +5,7 @@ import pandas as pd
 import urllib.request
 import selenium
 import requests
+from sqlalchemy import true
 import data_storage
 from slugify import slugify
 from datetime import datetime
@@ -652,7 +653,7 @@ class ProductPage(BasePage):
 
         return (frame, filename)
 
-    def scrape_prod_pages(self, href_list):
+    def scrape_prod_pages(self, href_list, data_store):
         """
         This is a function to scrape multiple product page types
 
@@ -670,7 +671,7 @@ class ProductPage(BasePage):
         """
         for i in tqdm(href_list):
             self.driver.get(i)
-            
+            prods_frame = pd.DataFrame()
             try:
                 try:
                     out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
@@ -704,9 +705,15 @@ class ProductPage(BasePage):
             else:
                 UUID = self.create_uuid()
                 print('uuid created')
-                self.frame, self.filename = self.assert_prod_page_type(i, UUID)
-                frame, filename = self.save_dataframe_locally(self.frame, self.filename)
-            return(frame, filename)
+                frame, self.filename = self.assert_prod_page_type(i, UUID)
+                #frame, filename = self.save_dataframe_locally(self.frame, self.filename)
+                filename = self.format_filename(self.filename)
+                frame.insert(0, "filename",filename)
+                prods_frame.append(frame, ignore_index=True)
+                
+        data_store.process_data(prods_frame)
+        print(prods_frame)
+        return(frame, filename)
             
         
     def test_rds_upload(self, href_list):

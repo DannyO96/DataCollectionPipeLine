@@ -118,7 +118,7 @@ class AsosScraper(unittest.TestCase):
         store_data.upload_raw_data_to_datalake()
 
     #test to upload a single dataframe to my relational database
-    def test_upload_frame_to_rds(self):
+    def est_upload_frame_to_rds(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -131,7 +131,7 @@ class AsosScraper(unittest.TestCase):
         data_store.process_data(self.frame, self.filename)
 
     #test to upload 1 search result page of scraped data to my relational database
-    def est_upload_frames_to_rds(self):
+    def test_upload_frames_to_rds(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -139,6 +139,8 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
+        data_store = data_storage.StoreData(self.rds_params)
+        product_page.scrape_prod_pages(self.href_list, data_store)
         
 
     #Method to close the webdriver    
