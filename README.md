@@ -26,8 +26,12 @@ I have got headless mode working it wasnt working as i was using the default use
 
 I have finally got the error handling for out of stock something went wrong and outlets pages so the scraper can run without errors due to unscrapable product pages.
 
-After setting up my s3 bucket and RDS I have created methods to upload the contents of the raw data folder to my s3 bucket.
+In order to set up the relational database and s3 bucket I created JSON files of the sensetive information credentials that I needed to gain access to my data stores and then initialised these parameters. The JSON files are opened and read in the setUp method of main.py then the parameters are specified in the init method of my StoreData class.
+
+After setting up my s3 bucket and RDS I have created methods to upload the contents of the raw data folder to my s3 bucket, this method save the files locally then uploads the contents of the local raw_data folder to the specified s3 bucket.
 
 I have written a test to upload a single dataframe to my database and confirmed it in a terminal window connected to the database however i will need to
-do some more work to ensure all the data is as i expect and ready for analysis and manipulation
+do some more work to ensure all the data is as i expect and ready for analysis and manipulation.
+
+Uploading an dataframe of scraped product info proved to be harder than expected do to some required reworking of my object model and level of abstraction in different parts of the code. and now i can succefully upload a 72 row dataframe of product information to my relational database.
 '''
