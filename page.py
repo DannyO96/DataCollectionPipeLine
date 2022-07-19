@@ -423,23 +423,23 @@ class ProductPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
-        frame = 1
+        prod_dict = 1
         filename = 1
         
         try:
             WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
-            frame, filename = self.scrape_primary_prodpage(UUID, i)
+            prod_dict, filename = self.scrape_primary_prodpage(UUID, i)
         except:
             try:
                 WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
-                frame, filename = self.scrape_altprod_pages(UUID, i)
+                prod_dict, filename = self.scrape_altprod_pages(UUID, i)
             except:
                 pass
             #try:
             #    frame, filename = self.scrape_secondary_product_page(UUID, i)
             #except:
             #    frame, filename = self.scrape_tertiary_product_page(UUID, i)
-        return(frame, filename)
+        return(prod_dict, filename)
         
 
         #number of buttons = sec or tert
@@ -569,7 +569,7 @@ class ProductPage(BasePage):
         self.switch_iframes()
         frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
-        filename = (product_name.text)
+        filename = (str(product_name.text))
         return(frame, filename)
     
     def format_filename(self, filename):
@@ -669,9 +669,12 @@ class ProductPage(BasePage):
             TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label or a something gone wrong label although try and accept blocks 
             have now been implemented to avoid this error.
         """
+        prods_frame = pd.DataFrame()
+        
         for i in tqdm(href_list):
             self.driver.get(i)
-            prods_frame = pd.DataFrame()
+            #collumns = ['filename','product_name', 'href', 'UUID', 'product_description', 'brand', 'size_and_fit', 'look_after_me', 'about_me', 'price_info', 'img_link']
+            #prods_frame = pd.DataFrame()
             try:
                 try:
                     out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
@@ -708,12 +711,13 @@ class ProductPage(BasePage):
                 frame, self.filename = self.assert_prod_page_type(i, UUID)
                 #frame, filename = self.save_dataframe_locally(self.frame, self.filename)
                 filename = self.format_filename(self.filename)
-                frame.insert(0, "filename",filename)
-                prods_frame.append(frame, ignore_index=True)
+                frame.insert(0, "filename", filename)
+                prods_frame = pd.concat([prods_frame,frame])
+                
                 
         data_store.process_data(prods_frame)
         print(prods_frame)
-        return(frame, filename)
+        #return(frame, filename)
             
         
     def test_rds_upload(self, href_list):
