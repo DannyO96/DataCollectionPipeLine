@@ -586,10 +586,10 @@ class ProductPage(BasePage):
         Raises:
             TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the
         """
-        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        #sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         new_filename = slugify(filename)
-        newest_filename = new_filename + sys_dtime
-        return(newest_filename)
+        #newest_filename = new_filename + sys_dtime
+        return(new_filename)
         
 
     
@@ -711,7 +711,9 @@ class ProductPage(BasePage):
                 frame, self.filename = self.assert_prod_page_type(i, UUID)
                 #frame, filename = self.save_dataframe_locally(self.frame, self.filename)
                 filename = self.format_filename(self.filename)
+                sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
                 frame.insert(0, "filename", filename)
+                frame.insert(0, "Date/Time", sys_dtime)
                 prods_frame = pd.concat([prods_frame,frame])
                 
                 
