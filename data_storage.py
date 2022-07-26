@@ -68,7 +68,18 @@ class StoreData():
 
     def send_dataframe_to_rds(self, frame):
         """
-        The dataframe is converted to sql
+        This is a function to convert the pandas dataframe to sql
+
+        Args:
+            param1: self 
+            param2: frame :the dataframe thats is being converted to an sql table
+
+        Returns:
+            The function uploads the dataframe to my relational database using the init methods of the data storage class and the asos scraper class
+
+        Raises:
+            ValueError: this error is raised when the incorrect datatype is passed to the function.
+        
         """
         engine = self.create_engine()
         frame.to_sql('products_final', con=engine, if_exists='append', index=sqlalchemy.false)
@@ -76,7 +87,7 @@ class StoreData():
 
     def process_data(self, frame):
         """
-        The dataframe is uloaded to rds
+        The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
         #frame.insert(0, "filename",filename)
         self.send_dataframe_to_rds(frame)
