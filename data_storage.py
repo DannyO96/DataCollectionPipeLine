@@ -9,7 +9,7 @@ import sqlalchemy
 import pandas
 import psycopg2
 import psycopg
-from locators import ProductPageLocators
+
 
 class StoreData():
     """
@@ -19,7 +19,6 @@ class StoreData():
         """
         This init method takes the s3 params from my.secrets.AWSbucket.json
         and initialises the boto3 s3 client module for interacting with my s3 buckets.
-
         It also takes rds params from my.secrets.RDSdb.json to interact with my postgresql database.
         """
         #self.bucket_name = s3_params['bucket_name']

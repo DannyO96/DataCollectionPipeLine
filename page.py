@@ -713,13 +713,13 @@ class ProductPage(BasePage):
                 filename = self.format_filename(self.filename)
                 sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
                 frame.insert(0, "filename", filename)
-                frame.insert(0, "Date/Time", sys_dtime)
+                frame.insert(0, "date_time", sys_dtime)
                 prods_frame = pd.concat([prods_frame,frame])
                 
                 
         data_store.process_data(prods_frame)
         print(prods_frame)
-        #return(frame, filename)
+        return(prods_frame)
             
         
     def test_rds_upload(self, href_list):
