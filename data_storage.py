@@ -82,7 +82,7 @@ class StoreData():
         
         """
         engine = self.create_engine()
-        frame.to_sql('products_final', con=engine, if_exists='append', index=sqlalchemy.false)
+        frame.to_sql('products_new', con=engine, if_exists='append', index=sqlalchemy.false)
         
 
     def process_data(self, frame):

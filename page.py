@@ -195,6 +195,7 @@ class SearchResultPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
+        now way use
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
         products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)
         href_list = []
@@ -207,6 +208,7 @@ class SearchResultPage(BasePage):
                 pass
             else:
                 href_list.append(href)
+        print(href_list)
         return(href_list)
 
     def is_results_found(self):
@@ -266,7 +268,7 @@ class ProductPage(BasePage):
 
     def frame_switch(self):
         """
-        This is an example of Google style.
+        This is a function to
 
         Args:
             param1: This is the first param.

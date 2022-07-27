@@ -1,6 +1,8 @@
 '''
 DATA COLLECTION PIPELINE
 
+work in progress - not all files are in use, most recent version uses main.py page.py locators.py and data_storage.py
+
 Grabs T-Shirts from ASOS - to generate a repo of products & prices. 
 
 I have created funtions to dynamically scrape asos and append the information to dictionaries and dictionaries of lists and then initialise a pandas dataframe. However manipulating and storing the data has been put on hold as my project has been interuppted by an asos student discount pop up that appears to be an iframe
