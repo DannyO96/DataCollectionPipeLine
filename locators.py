@@ -8,10 +8,9 @@ class MainPageLocators(object):
     MEN_SECTION = (By.XPATH, '//*[@id="globalBannerComponent"]/div/div/div/a[2]')
     
 class SearchResultsPageLocators(object):
-    #PRODUCT_CLASS = (By.CLASS_NAME, '')
-    PRODUCT_CONTAINER = (By.CLASS_NAME, 'gWO0bT1')
-    PRODUCT_LIST = (By.CLASS_NAME, "RIQzlgo")
-    PRODUCT_CLASS = (By.CLASS_NAME, 'KCXt8Eb')
+    PRODUCT_CONTAINER = (By.CLASS_NAME, 'rwglXzC')
+    PRODUCT_LIST = (By.CLASS_NAME, "gWO0bT1")
+    PRODUCT_TILE = (By.CLASS_NAME, 'KCXt8Eb')
     A_TAG = (By.TAG_NAME, 'a')
     IMG_TAG = (By.TAG_NAME, 'img')
     LOAD_MORE = (By.CLASS_NAME, "_39_qNys")

@@ -28,7 +28,7 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-blink-features=AutomationControlled')
         option.add_argument(f'user-agent={user_agent}')
         option.add_argument('--disable-dev-shm-usage')
-        #option.add_argument('--headless')
+        option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
     
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)

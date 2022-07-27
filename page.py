@@ -195,9 +195,9 @@ class SearchResultPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
-        now way use
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
-        products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)
+        productive = product_container.find_element(*SearchResultsPageLocators.PRODUCT_LIST)
+        products = productive.find_elements(*SearchResultsPageLocators.PRODUCT_TILE)
         href_list = []
 
         for product in products:
