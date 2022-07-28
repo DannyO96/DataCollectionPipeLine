@@ -13,7 +13,7 @@ class SearchResultsPageLocators(object):
     PRODUCT_TILE = (By.CLASS_NAME, 'KCXt8Eb')
     A_TAG = (By.TAG_NAME, 'a')
     IMG_TAG = (By.TAG_NAME, 'img')
-    LOAD_MORE = (By.CLASS_NAME, "_39_qNys")
+    LOAD_MORE = (By.CSS_SELECTOR, "#plp > div > div.rwglXzC > div > a")
 
 class ProductPageLocators(object):
 #primary product page 

@@ -79,13 +79,13 @@ class AsosScraper(unittest.TestCase):
         product_page.scrape_links(self.href_list)
 
     #Test to locally save the dataframes in the raw data folder with their corresponding images
-    def est_locally_save_dataframes_prod_page(self):
+    def test_locally_save_dataframes_and_images(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        self.href_list = search_result_page.get_href_List()
+        self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
@@ -96,11 +96,12 @@ class AsosScraper(unittest.TestCase):
         mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = search_result_page.get_href_list()
         search_result_page.load_more_results()
         search_result_page.load_more_results()
         self.href_list = search_result_page.get_href_list()
-        self.href_list.extend(self.href_list)
-        self.href_list.extend(self.href_list)
+        #self.href_list.extend(self.href_list)
+        #self.href_list.extend(self.href_list)
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
     
@@ -130,7 +131,7 @@ class AsosScraper(unittest.TestCase):
         data_store = data_storage.StoreData(self.rds_params, self.s3_params)
         data_store.process_data(prods_frame)
         
-    def test_upload_to_rds_and_upload_to_datalake(self):
+    def est_upload_to_rds_and_upload_to_datalake(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -147,7 +148,6 @@ class AsosScraper(unittest.TestCase):
     #Method to close the webdriver    
     def tearDown(self):
         self.driver.close()
-
 
 if __name__ == "__main__":
     unittest.main()

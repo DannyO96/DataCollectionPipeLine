@@ -515,7 +515,7 @@ class ProductPage(BasePage):
             param3: UUID the generated unique user id for the product in this instance of scraping
 
         Returns:
-            This function returns the dataframe of product information and the filename which is the full product name
+            This function returns the dataframe of product information and the filename which is the full product name the filename has been encoded to ensure it is byte type
 
         Raises:
             KeyError: Raises an exception.
@@ -593,39 +593,6 @@ class ProductPage(BasePage):
         new_filename = slugify(filename)
         return(new_filename)
         
-
-    
-    def save_dataframe_locally(self, frame, filename):
-        """
-        This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
-
-        Args:
-            param1: self
-            param2: frame - this is the dataframe returned from scraping one of the types of product page
-            param3: filename - this is the name of the product file
-
-        Returns:
-            This returns a folder in the raw_data folder where the name of the product is turned into a slug so it can be used as a foldername the foldername also incoperates 
-            sys dtime to avoid duplicate folders and allow for time period analysis of the data. The folder returned is named after the product and contains the gallery image jpeg and
-            the dataframe in json format.
-
-        Raises:
-            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the
-        """
-        #filename = product_name.text
-        new_filename = slugify(filename)
-        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{new_filename}{sys_dtime}")
-        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{new_filename}{sys_dtime}")
-        filepath = os.path.join(folder, f"{new_filename}{sys_dtime}.json")
-        frame.to_json(filepath, orient = 'table', default_handler=str)
-        filepath2 = os.path.join(folder, f"{new_filename}{sys_dtime}.jpeg")
-        img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
-        image_link = img_tag.get_attribute('src')
-        urllib.request.urlretrieve(image_link, filepath2)
-
-        return (frame, new_filename)
-
     def save_dataframe_and_image_locally(self, frame, filename):
         """
         This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
@@ -641,14 +608,15 @@ class ProductPage(BasePage):
             the dataframe in json format.
 
         Raises:
-            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the
+            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the the type is not byte like.
         """
         #filename = product_name.text
-        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}")
-        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}")
-        filepath = os.path.join(folder, f"{filename}.json")
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
         frame.to_json(filepath, orient = 'table', default_handler=str)
-        filepath2 = os.path.join(folder, f"{filename}.jpeg")
+        filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
         img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
         image_link = img_tag.get_attribute('src')
         urllib.request.urlretrieve(image_link, filepath2)
@@ -718,9 +686,6 @@ class ProductPage(BasePage):
                 frame.insert(0, "date_time", sys_dtime)
                 self.save_dataframe_and_image_locally(frame, filename)
                 prods_frame = pd.concat([prods_frame,frame])
-                
-                
-        #data_store.process_data(prods_frame)
         print(prods_frame)
         return(prods_frame)
             
