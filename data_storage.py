@@ -15,16 +15,16 @@ class StoreData():
     """
     This class is to interact with the s3 bucket to store images and features and to interact with the relational database
     """
-    def __init__(self, rds_params) -> None:
+    def __init__(self, rds_params, s3_params) -> None:
         """
         This init method takes the s3 params from my.secrets.AWSbucket.json
         and initialises the boto3 s3 client module for interacting with my s3 buckets.
         It also takes rds params from my.secrets.RDSdb.json to interact with my postgresql database.
         """
-        #self.bucket_name = s3_params['bucket_name']
-        #self.aws_access_key_id = s3_params['aws_access_key_id']
-        #self.aws_secret_access_key = s3_params['aws_secret_access_key']
-        #self.s3_client = boto3.client("s3")
+        self.bucket_name = s3_params['bucket_name']
+        self.aws_access_key_id = s3_params['aws_access_key_id']
+        self.aws_secret_access_key = s3_params['aws_secret_access_key']
+        self.s3_client = boto3.client("s3")
 
         #self.rds_params = {"database_type":self.database_type, "dbapi":self.dbapi, "endpoint":self.endpoint, "user":self.user, "password":self.password, "database":self.database, "port":self.port}
         self.database_type = rds_params['database_type']

@@ -35,5 +35,5 @@ After setting up my s3 bucket and RDS I have created methods to upload the conte
 I have written a test to upload a single dataframe to my database and confirmed it in a terminal window connected to the database however i will need to
 do some more work to ensure all the data is as i expect and ready for analysis and manipulation.
 
-Uploading an dataframe of scraped product info proved to be harder than expected do to some required reworking of my object model and level of abstraction in different parts of the code. and now i can succefully upload a 72 row dataframe of product information to my relational database. My next focus is to ensure I can run tests to upload to my s3 bucket and my relational database in the same test run as my current version
+Uploading an dataframe of scraped product info proved to be harder than expected do to some required reworking of my object model and level of abstraction in different parts of the code. and now i can succefully upload a 72 row dataframe of product information to my relational database. The scraper can now upload images and frames from single products to the datalake as JSON and Jpeg and then concatonates the frames to a frame off all the products from that scrape which is the uploaded to my relational database.
 '''

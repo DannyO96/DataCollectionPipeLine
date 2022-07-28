@@ -51,7 +51,7 @@ class AsosScraper(unittest.TestCase):
     #test to accept cookies
     def est_accept_cookies(self):
         mainPage = page.MainPage(self.driver)
-        mainPage.accept_cookies()
+        mainPage.headless_accept_cookies()
 
     #Test to search asos
     def est_search_asos(self):
@@ -78,7 +78,7 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.scrape_links(self.href_list)
 
-    #Test to locally save the dictionaries in the raw data folder
+    #Test to locally save the dataframes in the raw data folder with their corresponding images
     def est_locally_save_dataframes_prod_page(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
@@ -114,25 +114,11 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
-        store_data = data_storage.StoreData(self.s3_params)
+        store_data = data_storage.StoreData(self.rds_params, self.s3_params)
         store_data.upload_raw_data_to_datalake()
 
-    #test to upload a single dataframe to my relational database
-    def est_upload_frame_to_rds(self):
-        mainpage = page.MainPage(self.driver)
-        mainpage.headless_accept_cookies()
-        mainpage.navigate_to_men()
-        mainpage.search_asos()
-        search_result_page = page.SearchResultPage(self.driver)
-        self.href_list = search_result_page.get_href_list()
-        product_page = page.ProductPage(self.driver)
-        self.frame, self.filename = product_page.test_rds_upload(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params)
-        data_store.process_data(self.frame, self.filename)
-
     #test to upload 1 search result page of scraped data to my relational database
-    
-    def test_upload_frames_to_rds(self):
+    def est_upload_frames_to_rds(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -140,9 +126,23 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
-        data_store = data_storage.StoreData(self.rds_params)
-        product_page.scrape_prod_pages(self.href_list, data_store)
+        prods_frame = product_page.scrape_prod_pages(self.href_list)
+        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store.process_data(prods_frame)
         
+    def test_upload_to_rds_and_upload_to_datalake(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.headless_accept_cookies()
+        mainpage.navigate_to_men()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = search_result_page.get_href_list()
+        product_page = page.ProductPage(self.driver)
+        prods_frame = product_page.scrape_prod_pages(self.href_list)
+        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store.process_data(prods_frame)
+        data_store.upload_raw_data_to_datalake()
+
 
     #Method to close the webdriver    
     def tearDown(self):

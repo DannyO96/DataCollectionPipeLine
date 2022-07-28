@@ -208,7 +208,7 @@ class SearchResultPage(BasePage):
                 pass
             else:
                 href_list.append(href)
-        print(href_list)
+        #print(href_list)
         return(href_list)
 
     def is_results_found(self):
@@ -508,7 +508,7 @@ class ProductPage(BasePage):
 
     def scrape_altprod_pages(self, i ,UUID):
         """
-        This is a function to scrape the 
+        This is a function to scrape the alternate product page type with aria labels for the product details fields
         Args:
             param1: self
             param2: i - this is the href of the product
@@ -572,7 +572,8 @@ class ProductPage(BasePage):
         frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
         filename = (str(product_name.text))
-        return(frame, filename)
+        filename_bytes = filename.ecode()
+        return(frame, filename_bytes)
     
     def format_filename(self, filename):
         """
@@ -586,11 +587,10 @@ class ProductPage(BasePage):
             This function reeturns the filename ready to be save locally or on the cloud without issues
 
         Raises:
-            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the
+            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the type of the filename is and int
+
         """
-        #sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         new_filename = slugify(filename)
-        #newest_filename = new_filename + sys_dtime
         return(new_filename)
         
 
@@ -655,7 +655,7 @@ class ProductPage(BasePage):
 
         return (frame, filename)
 
-    def scrape_prod_pages(self, href_list, data_store):
+    def scrape_prod_pages(self, href_list):
         """
         This is a function to scrape multiple product page types
 
@@ -716,26 +716,14 @@ class ProductPage(BasePage):
                 sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
                 frame.insert(0, "filename", filename)
                 frame.insert(0, "date_time", sys_dtime)
+                self.save_dataframe_and_image_locally(frame, filename)
                 prods_frame = pd.concat([prods_frame,frame])
                 
                 
-        data_store.process_data(prods_frame)
+        #data_store.process_data(prods_frame)
         print(prods_frame)
         return(prods_frame)
             
-        
-    def test_rds_upload(self, href_list):
-        for i in tqdm(href_list):
-            pass
-        self.driver.get(i)
-        UUID = self.create_uuid()
-        print('uuid created')
-        frame, self.filename = self.assert_prod_page_type(i, UUID)
-        filename = self.format_filename(self.filename)
-        self.save_dataframe_and_image_locally(frame, filename)
-        return(frame, filename)
-        
-
 
 
 
