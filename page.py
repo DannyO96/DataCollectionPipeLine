@@ -83,7 +83,7 @@ class MainPage(BasePage):
 
     def navigate_to_women(self):
         """
-        This is a function to navigate to the womens section
+        This is a function to navigate to the womens section of asos
 
         Args:
             param1:self 
@@ -92,7 +92,7 @@ class MainPage(BasePage):
             Clicks the womens section button
 
         Raises:
-            Error "ASOS" not in self.driver.title
+            Element not found: usually occurs when the locator for the button has changed as the website has been updated.
         """
         element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
         element.click()
@@ -136,7 +136,7 @@ class MainPage(BasePage):
 
     def search_asos(self):
         """
-        This is an example of Google style.
+        This is a function to search asos for t-shirts it clicks the search bar and send the keys of the search term.
 
         Args:
             param1:self
@@ -245,16 +245,15 @@ class SearchResultPage(BasePage):
 
 #Product page class containing methods occuring on the page of a product 
 class ProductPage(BasePage):
+
     def close_modal_popup(self):
         """
         This is a function i created in an attempt to close the student discount modal popups
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
-
+            param1:self
         Returns:
-            This is a description of what is returned.
+            This function doesnt return anything it closes a modal pop up
 
         Raises:
             KeyError: Raises an exception.
@@ -265,25 +264,6 @@ class ProductPage(BasePage):
             print('discount closed')
         except Exception as ex:
             print('no discounts yet')
-
-    def frame_switch(self):
-        """
-        This is a function to
-
-        Args:
-            param1: This is the first param.
-            param2: This is a second param.
-
-        Returns:
-            This is a description of what is returned.
-
-        Raises:
-            KeyError: Raises an exception.
-        """
-        self.driver.switch_to.frame(ProductPageLocators.STUDENT_DISCOUNT_IFRAME)
-        element = self.driver.find_element(*ProductPageLocators.STUDENT_DISCOUNT_CLOSE)
-        element.click()
-        self.driver.Switch_to.default_content()
 
     def switch_iframes(self):
         """
@@ -304,31 +284,6 @@ class ProductPage(BasePage):
         for iframe in iframes:
             self.driver.switch_to.frame(iframe)        
             self.driver.switch_to.default_content()
-
-    def close_alert(self):
-        """
-        This is an example of Google style.
-
-        Args:
-            param1: This is the first param.
-            param2: This is a second param.
-
-        Returns:
-            This is a description of what is returned.
-
-        Raises:
-            KeyError: Raises an exception.
-        """
-        iframes = self.driver.find_elements(*ProductPageLocators.IFRAMES)
-        print(len(iframes))
-        for iframe in iframes:
-            try:
-                self.driver.switch_to.frame()
-                element = self.driver.find_element(*ProductPageLocators.STUDENT_DISCOUNT_CLOSE)
-                element.click()
-            except:
-                pass
-        self.driver.switch_to.default_content()
 
     def create_uuid(self):
         """
