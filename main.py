@@ -28,7 +28,7 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-blink-features=AutomationControlled')
         option.add_argument(f'user-agent={user_agent}')
         option.add_argument('--disable-dev-shm-usage')
-        option.add_argument('--headless')
+        #option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
     
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
@@ -79,7 +79,7 @@ class AsosScraper(unittest.TestCase):
         product_page.scrape_links(self.href_list)
 
     #Test to locally save the dataframes in the raw data folder with their corresponding images
-    def test_locally_save_dataframes_and_images(self):
+    def est_locally_save_dataframes_and_images(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
@@ -87,21 +87,23 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
-        product_page.scrape_prod_pages(self.href_list)
+        prods_frame = product_page.scrape_prod_pages(self.href_list)
+
 
     #Test to scrape multiple pages of products and store dataframes locally
-    def est_scrape_lots_of_prods(self):
+    def test_scrape_lots_of_prods(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
-        search_result_page.load_more_results()
-        search_result_page.load_more_results()
-        self.href_list = search_result_page.get_href_list()
-        #self.href_list.extend(self.href_list)
-        #self.href_list.extend(self.href_list)
+        while True:
+            thisl = search_result_page.get_href_list()
+            self.href_list += thisl
+            search_result_page.load_more_results()
+            if len(thisl) > 200:
+                break
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
     
@@ -114,7 +116,7 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
-        product_page.scrape_prod_pages(self.href_list)
+        df = product_page.scrape_prod_pages(self.href_list)
         store_data = data_storage.StoreData(self.rds_params, self.s3_params)
         store_data.upload_raw_data_to_datalake()
 

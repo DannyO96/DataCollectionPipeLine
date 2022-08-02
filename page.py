@@ -414,6 +414,7 @@ class ProductPage(BasePage):
 
         Returns:
             This function returns the dataframe of product information and the filename which is the full product name
+            return(frame, filename)
 
         Raises:
             KeyError: Raises an exception.
@@ -564,7 +565,7 @@ class ProductPage(BasePage):
 
         Raises:
             TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the the type is not byte like.
-        """
+        
         #filename = product_name.text
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
@@ -576,7 +577,7 @@ class ProductPage(BasePage):
         image_link = img_tag.get_attribute('src')
         urllib.request.urlretrieve(image_link, filepath2)
 
-        return (frame, filename)
+        return (frame, filename)"""
 
     def scrape_prod_pages(self, href_list):
         """
@@ -639,7 +640,9 @@ class ProductPage(BasePage):
                 sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
                 frame.insert(0, "filename", filename)
                 frame.insert(0, "date_time", sys_dtime)
-                self.save_dataframe_and_image_locally(frame, filename)
+                #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
+                #image_link = img_tag.get_attribute('src')
+                #self.save_dataframe_and_image_locally(frame, filename)
                 prods_frame = pd.concat([prods_frame,frame])
         print(prods_frame)
         return(prods_frame)

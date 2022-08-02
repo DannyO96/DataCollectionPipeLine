@@ -1,6 +1,5 @@
 import tempfile
 import boto3
-from botocore.exceptions import ClientError
 import json
 import os
 import urllib.request
@@ -9,6 +8,8 @@ import sqlalchemy
 import pandas
 import psycopg2
 import psycopg
+from botocore.exceptions import ClientError
+from datetime import datetime
 
 
 class StoreData():
@@ -34,6 +35,39 @@ class StoreData():
         self.password = rds_params['password']
         self.database = rds_params['database']
         self.port = rds_params['port']
+
+    def save_dataframe_and_image_locally(self, prods_frame):
+        """
+        This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
+
+        Args:
+            param1: self
+            param2: frame - this is the dataframe returned from scraping one of the types of product page
+            param3: filename - this is the name of the product file
+
+        Returns:
+            This returns a folder in the raw_data folder where the name of the product is turned into a slug so it can be used as a foldername the foldername also incoperates 
+            sys dtime to avoid duplicate folders and allow for time period analysis of the data. The folder returned is named after the product and contains the gallery image jpeg and
+            the dataframe in json format.
+
+        Raises:
+            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the the type is not byte like.
+        """
+        #filename = product_name.text
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
+        frame.to_json(filepath, orient = 'table', default_handler=str)
+        filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
+        #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
+        #image_link = img_tag.get_attribute('src')
+        #urllib.request.urlretrieve(image_link, filepath2)
+
+
+    def save_images_locally(self, image_link_list):
+        for image in image_link_list:
+            pass
 
 
     def upload_raw_data_to_datalake(self):
