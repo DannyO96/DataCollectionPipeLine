@@ -53,6 +53,7 @@ class StoreData():
         Raises:
             TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the the type is not byte like.
         """
+        rows = prods_frame.loc[0:72, 0:2]
         #filename = product_name.text
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
@@ -125,3 +126,17 @@ class StoreData():
         """
         #frame.insert(0, "filename",filename)
         self.send_dataframe_to_rds(frame)
+
+    def check_for_duplicates(self):
+        '''
+        SELECT * FROM
+        (SELECT *, count(*)
+        OVER
+        (PARTITION BY
+        product_name,
+        filename
+        ) AS count
+        FROM products_new) tableWithCount
+        WHERE tableWithCount.count > 1;
+        '''
+
