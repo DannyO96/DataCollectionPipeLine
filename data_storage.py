@@ -5,7 +5,7 @@ import os
 import urllib.request
 import shutil
 import sqlalchemy
-import pandas
+import pandas as pd
 import psycopg2
 import psycopg
 from botocore.exceptions import ClientError
@@ -103,7 +103,7 @@ class StoreData():
 
     def send_dataframe_to_rds(self, frame):
         """
-        This is a function to convert the pandas dataframe to sql
+        This is a function to check the database for name and price duplicates then convert the resulting pandas dataframe to sql
 
         Args:
             param1: self 
@@ -117,7 +117,11 @@ class StoreData():
         
         """
         engine = self.create_engine()
-        frame.to_sql('products_new', con=engine, if_exists='append', index=sqlalchemy.false)
+        old_frame = pd.read_sql_table('products_new', engine)
+        merged_dfs = pd.concat([old_frame, frame])
+        merged_dfs = merged_dfs.astype("str")
+        final_df = merged_dfs.drop_duplicates(subset=['filename', 'product_name', 'href', 'price_info'], keep = False)
+        final_df.to_sql('products_new', con=engine, if_exists='append', index=False)
         
 
     def process_data(self, frame):

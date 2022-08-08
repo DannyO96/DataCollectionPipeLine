@@ -28,7 +28,7 @@ class AsosScraper(unittest.TestCase):
         #option.add_argument('--disable-blink-features=AutomationControlled')
         option.add_argument(f'user-agent={user_agent}')
         option.add_argument('--disable-dev-shm-usage')
-        #option.add_argument('--headless')
+        option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
     
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
@@ -91,7 +91,7 @@ class AsosScraper(unittest.TestCase):
 
 
     #Test to scrape multiple pages of products and store dataframes locally
-    def test_scrape_lots_of_prods(self):
+    def est_scrape_lots_of_prods(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -111,7 +111,7 @@ class AsosScraper(unittest.TestCase):
     def est_upload_raw_data_to_s3(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
-        mainpage.navigate_to_men()
+        mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
@@ -121,7 +121,7 @@ class AsosScraper(unittest.TestCase):
         store_data.upload_raw_data_to_datalake()
 
     #test to upload 1 search result page of scraped data to my relational database
-    def est_upload_frames_to_rds(self):
+    def test_upload_frames_to_rds(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -136,7 +136,7 @@ class AsosScraper(unittest.TestCase):
     def est_upload_to_rds_and_upload_to_datalake(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
-        mainpage.navigate_to_men()
+        mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()

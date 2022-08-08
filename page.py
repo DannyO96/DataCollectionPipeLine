@@ -5,7 +5,6 @@ import pandas as pd
 import urllib.request
 import selenium
 import requests
-from sqlalchemy import true
 import data_storage
 from slugify import slugify
 from datetime import datetime
@@ -53,8 +52,8 @@ class MainPage(BasePage):
     
     def print_page_source(self):
         """
-        This is a function to print out the source html of the page im using, essentially its the function that helps to understand 
-        why headless mode isnt working correctly
+        This is a function to print out the source html of the page im using, essentially its the function that helps to debug 
+        issues with headless mode
         """
         url = ('https://www.asos.com/')
         headers = {
@@ -248,7 +247,7 @@ class ProductPage(BasePage):
 
     def close_modal_popup(self):
         """
-        This is a function i created in an attempt to close the student discount modal popups
+        This is a function i created to close the student discount modal popups
 
         Args:
             param1:self
@@ -527,8 +526,8 @@ class ProductPage(BasePage):
         self.switch_iframes()
         frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
-        filename = (str(product_name.text))
-        filename_bytes = filename.ecode()
+        filename = (product_name.text)
+        filename_bytes = filename.encode()
         return(frame, filename_bytes)
     
     def format_filename(self, filename):

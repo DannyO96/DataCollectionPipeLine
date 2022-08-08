@@ -18,14 +18,14 @@ class SearchResultsPageLocators(object):
 class ProductPageLocators(object):
 #primary product page 
     GALLERY_IMAGE = (By.XPATH, '//*[@id="product-gallery"]/div[2]/div[2]/div[2]/img')
-    PRODUCT_NAME = (By.XPATH, '//*[@id="aside-content"]/div[1]/h1')
+    PRODUCT_NAME = (By.XPATH, '//*[@id="pdp-react-critical-app"]/h1')
     PRODUCT_DETAILS_CONTAINER = (By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]')
     PRODUCT_CODE = (By.XPATH,'//*[@id="product-details-container"]/div[2]/div[1]/p')
     SIZE_INFO = (By.XPATH, '//*[@id="main-size-select-0"]')
     IMG_INFO = (By.XPATH, '//*[@id="product-details-container"]/div[3]/div[1]/p')
     PRODUCT_DETAILS = (By.XPATH, '//*[@id="product-details-container"]/div[1]/div')
     ABOUT_PRODUCT = (By.XPATH, '//*[@id="product-details-container"]/div[3]/div[2]/p')
-    PRICE_INFO = (By.XPATH, '//*[@id="product-price"]/div[1]/span[2]')
+    PRICE_INFO = (By.XPATH, '//*[@id="pdp-react-critical-app"]/div/span[1]')
     STUDENT_DISCOUNT_IFRAME = (By.ID, 'secure-script-container')
     IFRAMES = (By.TAG_NAME,"iframe")
     STUDENT_DISCOUNT_CLOSE = (By.XPATH, '//*[@id="att_lightbox_close"]/svg/path')
