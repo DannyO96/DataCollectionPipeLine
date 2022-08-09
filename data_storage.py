@@ -53,22 +53,27 @@ class StoreData():
         Raises:
             TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the the type is not byte like.
         """
-        rows = prods_frame.loc[0:72, 0:2]
+        #rows = prods_frame.loc[]
         #filename = product_name.text
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
         folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
         filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
-        frame.to_json(filepath, orient = 'table', default_handler=str)
+        #frame.to_json(filepath, orient = 'table', default_handler=str)
         filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
         #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
         #image_link = img_tag.get_attribute('src')
         #urllib.request.urlretrieve(image_link, filepath2)
 
 
-    def save_images_locally(self, image_link_list):
-        for image in image_link_list:
-            pass
+    def save_images_to_s3(self, image_link_list):
+
+        for image_link in image_link_list:
+            #etag = self.s3_client.head_object(Bucket='myBucket',Key='index.html')['ResponseMetadata']['HTTPHeaders']['etag']
+            #print(etag)
+            image = urllib.request.urlretrieve(image_link)
+            response = self.s3_client.upload_file(image)
+            
 
 
     def upload_raw_data_to_datalake(self):
@@ -104,6 +109,7 @@ class StoreData():
     def send_dataframe_to_rds(self, frame):
         """
         This is a function to check the database for name and price duplicates then convert the resulting pandas dataframe to sql
+        and send it to my relational database.
 
         Args:
             param1: self 
@@ -128,7 +134,6 @@ class StoreData():
         """
         The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
-        #frame.insert(0, "filename",filename)
         self.send_dataframe_to_rds(frame)
 
     def check_for_duplicates(self):

@@ -90,7 +90,7 @@ class AsosScraper(unittest.TestCase):
         prods_frame = product_page.scrape_prod_pages(self.href_list)
 
 
-    #Test to scrape multiple pages of products and store dataframes locally
+    #Test to scrape multiple pages of products
     def est_scrape_lots_of_prods(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
