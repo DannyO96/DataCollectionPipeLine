@@ -10,6 +10,7 @@ import psycopg2
 import psycopg
 from botocore.exceptions import ClientError
 from datetime import datetime
+import hashlib
 
 
 class StoreData():
@@ -26,6 +27,11 @@ class StoreData():
         self.aws_access_key_id = s3_params['aws_access_key_id']
         self.aws_secret_access_key = s3_params['aws_secret_access_key']
         self.s3_client = boto3.client("s3")
+        # Create a dictionary of the current image checksums(assumed md5 as < 16MB) I have stored in the bucket.
+        self.s3_etags = {}
+        for key in self.s3_client.list_objects(Bucket=self.bucket_name)['Contents']:
+            self.s3_etags[self.s3_client.head_object(Bucket=self.bucket_name,Key=key)['ResponseMetadata']['HTTPHeaders']['etag']]=key
+
 
         #self.rds_params = {"database_type":self.database_type, "dbapi":self.dbapi, "endpoint":self.endpoint, "user":self.user, "password":self.password, "database":self.database, "port":self.port}
         self.database_type = rds_params['database_type']
@@ -55,24 +61,37 @@ class StoreData():
         """
         #rows = prods_frame.loc[]
         #filename = product_name.text
-        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
+        #sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        #os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        #folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        #filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
         #frame.to_json(filepath, orient = 'table', default_handler=str)
-        filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
+        #filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
         #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
         #image_link = img_tag.get_attribute('src')
         #urllib.request.urlretrieve(image_link, filepath2)
 
 
-    def save_images_to_s3(self, image_link_list):
+    def save_images_to_s3(self, prods_frame):
+        '''
+        '''
+        for frame in prods_frame:
+            filename = frame.loc[:,'filename']
+            image_link = frame.loc[:,'img_link']
+            self.save_image_to_s3(self, image_link, filename)
 
-        for image_link in image_link_list:
-            #etag = self.s3_client.head_object(Bucket='myBucket',Key='index.html')['ResponseMetadata']['HTTPHeaders']['etag']
-            #print(etag)
-            image = urllib.request.urlretrieve(image_link)
-            response = self.s3_client.upload_file(image)
+    def save_image_to_s3(self,image_link,filename):
+        '''
+        '''
+        image = urllib.request.urlretrieve(image_link)
+        myetag=hashlib.md5(image).hexdigest()
+
+        if myetag in self.s3_etags:
+            print("")
+        else:
+            response = self.s3_client.upload_file(filename, self.bucket_name, image)
+            self.s3_etags[myetag]=filename
+
             
 
 
@@ -135,6 +154,8 @@ class StoreData():
         The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
         self.send_dataframe_to_rds(frame)
+        self.save_images_to_s3(frame)
+
 
     def check_for_duplicates(self):
         '''

@@ -18,7 +18,7 @@ class SearchResultsPageLocators(object):
 class ProductPageLocators(object):
 #primary product page 
     GALLERY_IMAGE = (By.XPATH, '//*[@id="product-gallery"]/div[2]/div[2]/div[2]/img')
-    PRODUCT_NAME = (By.XPATH, '//*[@id="pdp-react-critical-app"]/h1')
+    PRODUCT_NAME = (By.XPATH, '/html/body/div[1]/div/main/div[5]/section[1]/div/div[2]/div[3]/h1')#'//*[@id="pdp-react-critical-app"]/h1'
     PRODUCT_DETAILS_CONTAINER = (By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]')
     PRODUCT_CODE = (By.XPATH,'//*[@id="product-details-container"]/div[2]/div[1]/p')
     SIZE_INFO = (By.XPATH, '//*[@id="main-size-select-0"]')

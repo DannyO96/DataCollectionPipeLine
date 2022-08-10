@@ -458,7 +458,7 @@ class ProductPage(BasePage):
         prod_dict = {'product_name': name,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info_list, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
         frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
-        filename = name
+        filename = str(name).encode()
         return(frame, filename)
 
     def scrape_altprod_pages(self, i ,UUID):
@@ -527,7 +527,7 @@ class ProductPage(BasePage):
         frame = pd.DataFrame.from_dict(prod_dict)
         print(frame)
         filename = (product_name.text)
-        filename_bytes = filename.encode()
+        filename_bytes = str(filename).encode()
         return(frame, filename_bytes)
     
     def format_filename(self, filename):
@@ -598,8 +598,6 @@ class ProductPage(BasePage):
         
         for i in tqdm(href_list):
             self.driver.get(i)
-            #collumns = ['filename','product_name', 'href', 'UUID', 'product_description', 'brand', 'size_and_fit', 'look_after_me', 'about_me', 'price_info', 'img_link']
-            #prods_frame = pd.DataFrame()
             try:
                 try:
                     out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
@@ -634,14 +632,10 @@ class ProductPage(BasePage):
                 UUID = self.create_uuid()
                 print('uuid created')
                 frame, self.filename = self.assert_prod_page_type(i, UUID)
-                #frame, filename = self.save_dataframe_locally(self.frame, self.filename)
                 filename = self.format_filename(self.filename)
                 sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
                 frame.insert(0, "filename", filename)
                 frame.insert(0, "date_time", sys_dtime)
-                #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
-                #image_link = img_tag.get_attribute('src')
-                #self.save_dataframe_and_image_locally(frame, filename)
                 prods_frame = pd.concat([prods_frame,frame])
         print(prods_frame)
         return(prods_frame)
