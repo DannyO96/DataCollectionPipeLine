@@ -543,7 +543,7 @@ class ProductPage(BasePage):
 
         Raises:
             TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the type of the filename is and int
-
+        
         """
         new_filename = slugify(filename)
         return(new_filename)
@@ -632,7 +632,11 @@ class ProductPage(BasePage):
                 UUID = self.create_uuid()
                 print('uuid created')
                 frame, self.filename = self.assert_prod_page_type(i, UUID)
-                filename = self.format_filename(self.filename)
+                try:
+                    filename = self.format_filename(self.filename)
+                except:
+                    print("cant slug filename its got an int in it...")
+                    continue
                 sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
                 frame.insert(0, "filename", filename)
                 frame.insert(0, "date_time", sys_dtime)

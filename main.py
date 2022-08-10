@@ -149,7 +149,7 @@ class AsosScraper(unittest.TestCase):
 
     #Method to close the webdriver    
     def tearDown(self):
-        self.driver.close()
+        self.driver.close
 
 if __name__ == "__main__":
     unittest.main()

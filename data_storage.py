@@ -29,9 +29,10 @@ class StoreData():
         self.s3_client = boto3.client("s3")
         # Create a dictionary of the current image checksums(assumed md5 as < 16MB) I have stored in the bucket.
         self.s3_etags = {}
-        for key in self.s3_client.list_objects(Bucket=self.bucket_name)['Contents']:
+        keys = self.s3_client.list_objects(Bucket=self.bucket_name)['Contents']
+        for key in keys:
             self.s3_etags[self.s3_client.head_object(Bucket=self.bucket_name,Key=key)['ResponseMetadata']['HTTPHeaders']['etag']]=key
-
+        print()
 
         #self.rds_params = {"database_type":self.database_type, "dbapi":self.dbapi, "endpoint":self.endpoint, "user":self.user, "password":self.password, "database":self.database, "port":self.port}
         self.database_type = rds_params['database_type']
