@@ -73,10 +73,15 @@ class StoreData():
         #urllib.request.urlretrieve(image_link, filepath2)
 
 
-    def save_images_to_s3(self, prods_frame):
+    def save_images_to_s3(self, prods_frame, engine):
         '''
         '''
-        for frame in prods_frame:
+        old_frame = pd.read_sql_table('products_new', engine)
+        merged_dfs = pd.concat([old_frame, frame])
+        merged_dfs = merged_dfs.astype("str")
+        final_df = merged_dfs.drop_duplicates(subset=['img_link'], keep = False)
+
+        for frame in final_df:
             filename = frame.loc[:,'filename']
             image_link = frame.loc[:,'img_link']
             self.save_image_to_s3(self, image_link, filename)
@@ -156,6 +161,8 @@ class StoreData():
         """
         self.send_dataframe_to_rds(frame)
         self.save_images_to_s3(frame)
+
+        
 
 
     def check_for_duplicates(self):
