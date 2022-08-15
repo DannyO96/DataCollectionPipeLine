@@ -26,7 +26,7 @@ relevant to scraping that type of page on my chosen website.
 """
 class BasePage(object):
     """
-    This is the base page class it instanciates the webdriver and its method is inherited by every page class
+    This is the base page class it instanciates the webdriver and its methods are inherited by every page class in my page object model
     """
     def __init__(self, driver):
         self.driver = driver
@@ -34,7 +34,9 @@ class BasePage(object):
 
 #The main page class containing methods occuring on the main page of the website
 class MainPage(BasePage):
-
+    """
+    This is the main page class its methods concern actions of the webdriver occuring on the asos homepage and it inherits the methods of base page.
+    """
     def does_title_match(self):
         """
         This is a function to check is the name of the site is in the title of the webpage.
@@ -53,14 +55,13 @@ class MainPage(BasePage):
     def print_page_source(self):
         """
         This is a function to print out the source html of the page im using, essentially its the function that helps to debug 
-        issues with headless mode
+        issues with headless mode.
         """
         url = ('https://www.asos.com/')
         headers = {
             'User-Agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36",
             'Content-Type': 'text/html',
         }
-
         response = requests.get(url, headers=headers)
         html = response.text
         print(html)
@@ -152,7 +153,10 @@ class MainPage(BasePage):
 
 #Search results page class containing methods occuring on the search results page of the website
 class SearchResultPage(BasePage):
-
+    """
+    This is the search results page class its methods concern actions of the webdriver occuring on the search results page,
+    it inherits methods from the base page.
+    """
     def get_image_links(self):
         """
         This function generates a list of image links from the search results page
@@ -244,6 +248,9 @@ class SearchResultPage(BasePage):
 
 #Product page class containing methods occuring on the page of a product 
 class ProductPage(BasePage):
+    """
+    This is the product page class its methods concern webdriver actions occuring on product pages, it inherits methods from the base page.
+    """
 
     def close_modal_popup(self):
         """
