@@ -28,12 +28,13 @@ class StoreData():
         self.aws_secret_access_key = s3_params['aws_secret_access_key']
         self.s3_client = boto3.client("s3")
         # Create a dictionary of the current image checksums(assumed md5 as < 16MB) I have stored in the bucket.
+        '''
         self.s3_etags = {}
         keys = self.s3_client.list_objects(Bucket=self.bucket_name)['Contents']
         for key in keys:
             self.s3_etags[self.s3_client.head_object(Bucket=self.bucket_name,Key=key)['ResponseMetadata']['HTTPHeaders']['etag']]=key
         print()
-
+        '''
         #self.rds_params = {"database_type":self.database_type, "dbapi":self.dbapi, "endpoint":self.endpoint, "user":self.user, "password":self.password, "database":self.database, "port":self.port}
         self.database_type = rds_params['database_type']
         self.dbapi = rds_params['dbapi']
@@ -76,27 +77,40 @@ class StoreData():
     def save_images_to_s3(self, prods_frame, engine):
         '''
         '''
+        current_imgs = prods_frame.iloc[:,'img_link']
         old_frame = pd.read_sql_table('products_new', engine)
-        merged_dfs = pd.concat([old_frame, frame])
+        old_imgs = old_frame.loc[:,'img_link']
+        merged_dfs = pd.concat([old_frame, prods_frame])
         merged_dfs = merged_dfs.astype("str")
-        final_df = merged_dfs.drop_duplicates(subset=['img_link'], keep = False)
+        final_df = merged_dfs.drop_duplicates(subset=['filename', 'img_link'], keep = False)
+        new_imgs = []
+
+        for img in current_imgs:
+            if img in old_imgs:
+                continue
+            else:
+                new_imgs.append(img)
 
         for frame in final_df:
-            filename = frame.loc[:,'filename']
-            image_link = frame.loc[:,'img_link']
-            self.save_image_to_s3(self, image_link, filename)
+            filename = frame.iloc[:,'filename']
+            image_link = frame.iloc[:,'img_link']
+            if image_link in old_imgs:
+                pass
+            else:
+                self.save_image_to_s3(self, image_link, filename)
 
     def save_image_to_s3(self,image_link,filename):
         '''
+
         '''
         image = urllib.request.urlretrieve(image_link)
-        myetag=hashlib.md5(image).hexdigest()
+        #myetag = hashlib.md5(image).hexdigest()
 
-        if myetag in self.s3_etags:
-            print("")
-        else:
-            response = self.s3_client.upload_file(filename, self.bucket_name, image)
-            self.s3_etags[myetag]=filename
+        #if myetag in self.s3_etags:
+        #    print("")
+        #else:
+        response = self.s3_client.upload_file(filename, self.bucket_name, image)
+        #self.s3_etags[myetag]=filename
 
             
 
@@ -159,8 +173,9 @@ class StoreData():
         """
         The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
+        engine = self.create_engine()
         self.send_dataframe_to_rds(frame)
-        self.save_images_to_s3(frame)
+        self.save_images_to_s3(frame, engine)
 
         
 
