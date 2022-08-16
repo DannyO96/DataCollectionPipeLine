@@ -41,5 +41,5 @@ My tests are all working however im unhappy with the architecture of my scraper 
 that in order to save images and dataframes locally I will need to use pandas to extract information from the prods_dataframe in order to locally save my scraped data. My other current focus is to be able to extend the href_list to scrape a larger number of products in a single scrape without scraping duplicates.
 
 All tests are working successfully now I am beggining to focus on learning sql to allow for better database management and to prevent rescraping of images and dataframes where the dataframes are analagous as we still want to rescrape any changes in products information most notably price. I have implemented the pandas drop_duplicates method to avoid rescraping of previously scraped information using the filename, href  and price as the subset for my duplicates.
-Although this made need to also include size information so I can track changes in price and size availabillity within my dataset. 
+Although this may need to also include size information so I can track changes in price and size availabillity within my dataset. After attempting to connect to the s3 bucket and check the etags of each item in the bucket im going to check the relational database fdor duplicate image links that have already been uploaded.
 '''

@@ -15,7 +15,7 @@ import hashlib
 
 class StoreData():
     """
-    This class is to interact with the s3 bucket to store images and features and to interact with the relational database
+    This class is to interact with an s3 bucket to store images and features and to interact a relational database
     """
     def __init__(self, rds_params, s3_params) -> None:
         """
@@ -76,8 +76,9 @@ class StoreData():
 
     def save_images_to_s3(self, prods_frame, engine):
         '''
+        This is a funtion to check the relational database for matching image links drop duplicates and upload any new images to the s3 bucket.
         '''
-        current_imgs = prods_frame.iloc[:,'img_link']
+        current_imgs = prods_frame.loc[:,'img_link']
         old_frame = pd.read_sql_table('products_new', engine)
         old_imgs = old_frame.loc[:,'img_link']
         merged_dfs = pd.concat([old_frame, prods_frame])
@@ -92,8 +93,8 @@ class StoreData():
                 new_imgs.append(img)
 
         for frame in final_df:
-            filename = frame.iloc[:,'filename']
-            image_link = frame.iloc[:,'img_link']
+            filename = frame.loc[:,'filename']
+            image_link = frame.loc[:,'img_link']
             if image_link in old_imgs:
                 pass
             else:
@@ -101,7 +102,7 @@ class StoreData():
 
     def save_image_to_s3(self,image_link,filename):
         '''
-
+        This is a function to upload a single image to s3
         '''
         image = urllib.request.urlretrieve(image_link)
         #myetag = hashlib.md5(image).hexdigest()
@@ -142,6 +143,9 @@ class StoreData():
             return False
 
     def create_engine(self):
+        """
+        This funtion creates an engine to connect with my relational database.
+        """
         engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
         return engine
 

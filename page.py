@@ -216,7 +216,7 @@ class SearchResultPage(BasePage):
 
     def is_results_found(self):
         """
-        This is an example of Google style.
+        This is a function to test the title of the webpage
 
         Args:
             param1: self
@@ -594,8 +594,10 @@ class ProductPage(BasePage):
             param2: href_list, this is a list of links to product pages returned from the function get href list.
 
         Returns:
-            This function iterates through every link in the href list, checks for know exceptions then creates a UUID for the product asserts the type of product page then creates a dataframe and saves it locally
-            in a folder in the raw data folder with the image and dataframe contained in the folder.
+            This function iterates through every link in the href list, checks for know exceptions then 
+            creates a UUID for the product asserts the type of product page then creates a dataframe which has two collumns added for date time and 
+            the slugifyed filename. This dataframe for a single product is then concatenated to the dataframe of all the products which is returned 
+            after all the products have been scraped.
 
         Raises:
             TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label or a something gone wrong label although try and accept blocks 
