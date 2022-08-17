@@ -74,13 +74,15 @@ class StoreData():
         #urllib.request.urlretrieve(image_link, filepath2)
 
 
-    def save_images_to_s3(self, prods_frame, engine):
+    def save_images_to_s3(self, prods_frame: pd.DataFrame, engine):
         '''
         This is a funtion to check the relational database for matching image links drop duplicates and upload any new images to the s3 bucket.
         '''
-        current_imgs = prods_frame.loc[:,'img_link']
+        #df = pd.DataFrame
+        #dfd = pd.concat([df, prods_frame])
         old_frame = pd.read_sql_table('products_new', engine)
         old_imgs = old_frame.loc[:,'img_link']
+        current_imgs = prods_frame.loc[:,'img_link']
         merged_dfs = pd.concat([old_frame, prods_frame])
         merged_dfs = merged_dfs.astype("str")
         final_df = merged_dfs.drop_duplicates(subset=['filename', 'img_link'], keep = False)
@@ -92,9 +94,9 @@ class StoreData():
             else:
                 new_imgs.append(img)
 
-        for frame in final_df:
-            filename = frame.loc[:,'filename']
-            image_link = frame.loc[:,'img_link']
+        for index, row in final_df.iterrows():
+            filename = row.loc['filename']
+            image_link = row.loc['img_link']
             if image_link in old_imgs:
                 pass
             else:

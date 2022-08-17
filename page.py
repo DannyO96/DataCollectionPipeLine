@@ -650,7 +650,7 @@ class ProductPage(BasePage):
                 frame.insert(0, "filename", filename)
                 frame.insert(0, "date_time", sys_dtime)
                 prods_frame = pd.concat([prods_frame,frame])
-        print(prods_frame)
+        print("scrape_prod_pages.prods_frame=",prods_frame)
         return(prods_frame)
             
 
