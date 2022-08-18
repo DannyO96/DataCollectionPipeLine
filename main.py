@@ -90,7 +90,7 @@ class AsosScraper(unittest.TestCase):
         prods_frame = product_page.scrape_prod_pages(self.href_list)
 
 
-    #Test to scrape multiple pages of products
+    #Test to scrape multiple pages of products and upload the product data to s3 and rds
     def est_scrape_lots_of_prods(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
@@ -99,14 +99,17 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
         while True:
+            search_result_page.load_more_results()
             thisl = search_result_page.get_href_list()
             self.href_list += thisl
-            search_result_page.load_more_results()
             if len(thisl) > 200:
                 break
         product_page = page.ProductPage(self.driver)
-        product_page.scrape_prod_pages(self.href_list)
-    
+        prods_frame = product_page.scrape_prod_pages(self.href_list)
+        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store.process_data(prods_frame)
+
+
     #Test to fill and upload the raw_data folder to an amazon s3 bucket
     def est_upload_raw_data_to_s3(self):
         mainpage = page.MainPage(self.driver)

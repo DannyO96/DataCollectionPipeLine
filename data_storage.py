@@ -32,7 +32,7 @@ class StoreData():
         self.s3_etags = {}
         keys = self.s3_client.list_objects(Bucket=self.bucket_name)['Contents']
         for key in keys:
-            self.s3_etags[self.s3_client.head_object(Bucket=self.bucket_name,Key=key)['ResponseMetadata']['HTTPHeaders']['etag']]=key
+        self.s3_etags[self.s3_client.head_object(Bucket=self.bucket_name,Key=key)['ResponseMetadata']['HTTPHeaders']['etag']]=key
         print()
         '''
         #self.rds_params = {"database_type":self.database_type, "dbapi":self.dbapi, "endpoint":self.endpoint, "user":self.user, "password":self.password, "database":self.database, "port":self.port}
@@ -86,38 +86,26 @@ class StoreData():
         merged_dfs = pd.concat([old_frame, prods_frame])
         merged_dfs = merged_dfs.astype("str")
         final_df = merged_dfs.drop_duplicates(subset=['filename', 'img_link'], keep = False)
-        new_imgs = []
 
-        for img in current_imgs:
-            if img in old_imgs:
-                continue
-            else:
-                new_imgs.append(img)
-
-        for index, row in final_df.iterrows():
+        for index,row in final_df.iterrows():
             filename = row.loc['filename']
             image_link = row.loc['img_link']
-            if image_link in old_imgs:
-                pass
-            else:
-                self.save_image_to_s3(self, image_link, filename)
+            for image_link in row:
+                if image_link in old_imgs:
+                    continue
+                else:
+                    self.save_image_to_s3(self, image_link, filename)
 
     def save_image_to_s3(self,image_link,filename):
         '''
         This is a function to upload a single image to s3
         '''
-        image = urllib.request.urlretrieve(image_link)
-        #myetag = hashlib.md5(image).hexdigest()
-
-        #if myetag in self.s3_etags:
-        #    print("")
-        #else:
-        response = self.s3_client.upload_file(filename, self.bucket_name, image)
-        #self.s3_etags[myetag]=filename
-
+        try:
+            image = urllib.request.urlretrieve(image_link)
+            response = self.s3_client.upload_file(filename, self.bucket_name, image)
+        except ClientError as E:
+            print("test upload 2 s3 exception",E)
             
-
-
     def upload_raw_data_to_datalake(self):
         """
         This is a function to upload the contents of the raw_data folder to and s3 bucket
@@ -174,17 +162,23 @@ class StoreData():
         final_df = merged_dfs.drop_duplicates(subset=['filename', 'product_name', 'href', 'price_info'], keep = False)
         final_df.to_sql('products_new', con=engine, if_exists='append', index=False)
         
-
-    def process_data(self, frame):
+    def process_data(self, prods_frame):
         """
         The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
         engine = self.create_engine()
-        self.send_dataframe_to_rds(frame)
-        self.save_images_to_s3(frame, engine)
+        self.send_dataframe_to_rds(prods_frame)
+        self.save_images_to_s3(prods_frame, engine)
 
-        
-
+    def locally_save_frame_and_image(self, frame : pd.DataFrame, filename):
+        image_link = frame.loc['img_link']
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
+        frame.to_json(filepath, orient = 'table', default_handler=str)
+        filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
+        urllib.request.urlretrieve(image_link, filepath2)
 
     def check_for_duplicates(self):
         '''
