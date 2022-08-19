@@ -99,6 +99,17 @@ class StoreData():
     def save_image_to_s3(self,image_link,filename):
         '''
         This is a function to upload a single image to s3
+        Args:
+            param1:self 
+            param2:image_link: link to the image
+            param3:filename:this is a slug of the products name suitable for use as a filename.
+
+        Returns:
+            Returns a bool indicating if the upload was successfull.
+
+        Raises:
+            TypeError
+            ClientError
         '''
         try:
             image = urllib.request.urlretrieve(image_link)

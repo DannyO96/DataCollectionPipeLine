@@ -146,6 +146,8 @@ class MainPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
+
         """
         element = self.driver.find_element(*MainPageLocators.SEARCH_BAR)
         element.send_keys("tshirt")
@@ -169,6 +171,8 @@ class SearchResultPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
+
         """
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
         products = product_container.find_elements(*SearchResultsPageLocators.PRODUCT_LIST)
@@ -197,6 +201,8 @@ class SearchResultPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
+
         """
         product_container = self.driver.find_element(*SearchResultsPageLocators.PRODUCT_CONTAINER)
         productive = product_container.find_element(*SearchResultsPageLocators.PRODUCT_LIST)
@@ -242,6 +248,8 @@ class SearchResultPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
+
         """
         element = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
         element.click()
@@ -263,6 +271,8 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
+
         """
         try: 
             element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT_CLOSE))
@@ -284,6 +294,7 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
         iframes = self.driver.find_elements(*ProductPageLocators.IFRAMES)
         print(len(iframes))
@@ -318,6 +329,7 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
         image_link_list = []
         productname_list = []
@@ -424,6 +436,7 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
         element = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
         element.click()
@@ -481,6 +494,7 @@ class ProductPage(BasePage):
 
         Raises:
             KeyError: Raises an exception.
+            elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
         product_description_list = []
         brand_list = []
