@@ -10,7 +10,7 @@ import psycopg2
 import psycopg
 from botocore.exceptions import ClientError
 from datetime import datetime
-import hashlib
+
 
 
 class StoreData():
@@ -81,16 +81,23 @@ class StoreData():
         #df = pd.DataFrame
         #dfd = pd.concat([df, prods_frame])
         old_frame = pd.read_sql_table('products_new', engine)
-        old_imgs = old_frame.loc[:,'img_link']
-        current_imgs = prods_frame.loc[:,'img_link']
+        old_imgs = []
+
+        for index, row in old_frame.iterrows():
+            img_link = row.at['img_link']
+            old_imgs.append(img_link)
+
+        #current_imgs = prods_frame.loc[:,'img_link']
         merged_dfs = pd.concat([old_frame, prods_frame])
         merged_dfs = merged_dfs.astype("str")
-        final_df = merged_dfs.drop_duplicates(subset=['filename', 'img_link'], keep = False)
+        final_df = merged_dfs.drop_duplicates(subset=['img_link'], keep = False)
 
         for index,row in final_df.iterrows():
-            filename = row.loc['filename']
-            image_link = row.loc['img_link']
-            for image_link in row:
+            filename = row.at['filename']
+            image_link = row.at['img_link']
+            image_link_list = []
+            image_link_list.append(image_link)
+            for image_link in image_link_list:
                 if image_link in old_imgs:
                     continue
                 else:

@@ -5,19 +5,18 @@ import pandas as pd
 import urllib.request
 import selenium
 import requests
-import data_storage
-from slugify import slugify
+from data_storage import StoreData
 from datetime import datetime
+from locators import MainPageLocators
+from locators import ProductPageLocators
+from locators import SearchResultsPageLocators
+from element import BasePageElement
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
-from locators import MainPageLocators
-from locators import ProductPageLocators
-from locators import SearchResultsPageLocators
-from element import BasePageElement
-from data_storage import StoreData
+from slugify import slugify
 from tqdm import tqdm
 
 """
@@ -340,21 +339,15 @@ class ProductPage(BasePage):
         proddetails_list = []
         aboutprod_list = []
         priceinfo_list = []
-        #frame = pd.DataFrame(prod_dict, index = UUID, columns = list('prodcode', 'sizeinfo', 'imginfo', 'proddetails', 'aboutprod', 'priceinfo'))
-        #frame = pd.DataFrame()
 
-        for i in tqdm(href_list):
-            self.driver.get(i)
-            print("current href is ?", i)
+        for href in tqdm(href_list):
+            self.driver.get(href)
+            print("current href is ?", href)
             UUID = self.create_uuid()
             self.switch_iframes()
             element = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-            #self.switch_iframes()
             element.click()
             self.switch_iframes()
-            
-            
-            #(/html/body)
 
             product_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
             product_code = self.driver.find_element(*ProductPageLocators.PRODUCT_CODE)
@@ -378,8 +371,7 @@ class ProductPage(BasePage):
 
             prod_dict = {'product_name': productname_list,'href': i, 'UUID': uuid_list, 'product_code': prodcode_list, 'size_info' : sizeinfo_list, 'img_info' : imginfo_list, 'product_details' : proddetails_list, 'about_product' : aboutprod_list, 'price_info'  : priceinfo_list, 'img_link' : image_link_list}
         frame = pd.DataFrame.from_dict(prod_dict, ignore_index=True)
-            #frame.reindex(UUID)
-            #frame = frame.append(prod_dict, ignore_index=True)
+        
         print(frame)
         return(frame)
 
@@ -410,15 +402,8 @@ class ProductPage(BasePage):
                 prod_dict, filename = self.scrape_altprod_pages(UUID, i)
             except:
                 pass
-            #try:
-            #    frame, filename = self.scrape_secondary_product_page(UUID, i)
-            #except:
-            #    frame, filename = self.scrape_tertiary_product_page(UUID, i)
+            
         return(prod_dict, filename)
-        
-
-        #number of buttons = sec or tert
-    
 
     def scrape_primary_prodpage(self, i, UUID):
         """
@@ -502,36 +487,27 @@ class ProductPage(BasePage):
         look_after_me_list = []
         about_me_list = []
         
-        #buttons = self.driver.find_elements(*ProductPageLocators.SECONDARY_BUTTONS)
-        #for button in buttons:
-        #    button.click()
-            #text = button.get_attribute("aria-label")
         try:
-            #product_description = self.driver.find_element(ProductPageLocators.PRODUCT_DESCRIPTION)
             product_description = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
             product_description_list.append(product_description.get_attribute("textContent"))
         except:
             product_description_list.append("NULL")
         try:
-            #brand = self.driver.find_element(ProductPageLocators.BRAND)
             brand = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
             brand_list.append(brand.get_attribute("textContent"))
         except:
             brand_list.append('NULL')
         try:
-            #size_and_fit = self.driver.find_element(ProductPageLocators.SIZE_AND_FIT)
             size_and_fit = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
             size_and_fit_list.append(size_and_fit.get_attribute("textContent"))
         except:
             size_and_fit_list.append('NULL')
         try:
-            #look_after_me = self.driver.find_element(ProductPageLocators.LOOK_AFTER_ME)
             look_after_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
             look_after_me_list.append(look_after_me.get_attribute("textContent"))
         except:
             look_after_me_list.append('NULL')
         try:
-            #about_me = self.driver.find_element(ProductPageLocators.ABOUT_ME)
             about_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
             about_me_list.append(about_me.get_attribute("textContent"))
         except:
@@ -619,8 +595,8 @@ class ProductPage(BasePage):
         """
         prods_frame = pd.DataFrame()
         
-        for i in tqdm(href_list):
-            self.driver.get(i)
+        for href in tqdm(href_list):
+            self.driver.get(href)
             try:
                 try:
                     out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
@@ -654,7 +630,7 @@ class ProductPage(BasePage):
             else:
                 UUID = self.create_uuid()
                 print('uuid created')
-                frame, self.filename = self.assert_prod_page_type(i, UUID)
+                frame, self.filename = self.assert_prod_page_type(href, UUID)
                 try:
                     filename = self.format_filename(self.filename)
                 except:
