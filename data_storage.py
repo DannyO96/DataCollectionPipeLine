@@ -44,7 +44,39 @@ class StoreData():
         self.database = rds_params['database']
         self.port = rds_params['port']
 
-    def save_dataframe_and_image_locally(self, prods_frame):
+    def save_locally(self, prods_frame:pd.DataFrame):
+        """
+        This is a function that iterates over the rows of the prods frame to locally save each dataframe and image locally
+
+        Args:
+            param1: self
+            param2: frame - this is the dataframe returned from scraping one of the types of product page
+            param3: filename - this is the name of the product file
+
+        Returns:
+            This returns a folder in the raw_data folder the foldername also incoperates sys dtime to avoid duplicate folders and allow for time period 
+            analysis of the data. The folder returned is named after the product and contains the gallery image jpeg and
+            the dataframe in json format.
+
+        Raises:
+        
+        """
+        for index,row in prods_frame.iterrows():
+            filename = row.at['filename']
+            self.locally_save_frame_and_image(row, filename)
+        #rows = prods_frame.loc[]
+        #filename = product_name.text
+        #sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        #os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        #folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        #filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
+        #frame.to_json(filepath, orient = 'table', default_handler=str)
+        #filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
+        #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
+        #image_link = img_tag.get_attribute('src')
+        #urllib.request.urlretrieve(image_link, filepath2)
+
+    def locally_save_frame_and_image(self, frame : pd.DataFrame, filename):
         """
         This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
 
@@ -59,19 +91,16 @@ class StoreData():
             the dataframe in json format.
 
         Raises:
-            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the the type is not byte like.
+            T
         """
-        #rows = prods_frame.loc[]
-        #filename = product_name.text
-        #sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-        #os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        #folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        #filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
-        #frame.to_json(filepath, orient = 'table', default_handler=str)
-        #filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
-        #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
-        #image_link = img_tag.get_attribute('src')
-        #urllib.request.urlretrieve(image_link, filepath2)
+        image_link = frame.at['img_link']
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
+        filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
+        frame.to_json(filepath, orient = 'table', default_handler=str)
+        filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
+        urllib.request.urlretrieve(image_link, filepath2)
 
 
     def save_images_to_s3(self, prods_frame: pd.DataFrame, engine):
@@ -81,12 +110,13 @@ class StoreData():
         #df = pd.DataFrame
         #dfd = pd.concat([df, prods_frame])
         old_frame = pd.read_sql_table('products_new', engine)
+        '''
         old_imgs = []
 
         for index, row in old_frame.iterrows():
             img_link = row.at['img_link']
             old_imgs.append(img_link)
-
+        '''
         #current_imgs = prods_frame.loc[:,'img_link']
         merged_dfs = pd.concat([old_frame, prods_frame])
         merged_dfs = merged_dfs.astype("str")
@@ -95,13 +125,15 @@ class StoreData():
         for index,row in final_df.iterrows():
             filename = row.at['filename']
             image_link = row.at['img_link']
-            image_link_list = []
-            image_link_list.append(image_link)
-            for image_link in image_link_list:
-                if image_link in old_imgs:
-                    continue
-                else:
-                    self.save_image_to_s3(self, image_link, filename)
+            #image_link_list = []
+            #image_link_list.append(image_link)
+            #for image_link in image_link_list:
+            #    if image_link in old_imgs:
+            #        print("this is an old image")
+             #       continue
+            #    else:
+            self.save_image_to_s3(self, image_link, filename)
+            print("image uploaded to s3")
 
     def save_image_to_s3(self,image_link,filename):
         '''
@@ -185,18 +217,10 @@ class StoreData():
         The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
         engine = self.create_engine()
+        print("saving dataframe to rds....")
         self.send_dataframe_to_rds(prods_frame)
+        print("uploading images to s3....")
         self.save_images_to_s3(prods_frame, engine)
-
-    def locally_save_frame_and_image(self, frame : pd.DataFrame, filename):
-        image_link = frame.loc['img_link']
-        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
-        frame.to_json(filepath, orient = 'table', default_handler=str)
-        filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
-        urllib.request.urlretrieve(image_link, filepath2)
 
     def check_for_duplicates(self):
         '''
