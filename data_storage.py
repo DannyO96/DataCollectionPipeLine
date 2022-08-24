@@ -222,11 +222,11 @@ class StoreData():
         The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
         engine = self.create_engine()
-        print("saving dataframe to rds....")
-        self.send_dataframe_to_rds(prods_frame)
         print("uploading images to s3....")
         self.save_images_to_s3(prods_frame, engine)
-
+        print("saving dataframe to rds....")
+        self.send_dataframe_to_rds(prods_frame)
+        
     def check_for_duplicates(self):
         '''
         SELECT * FROM
