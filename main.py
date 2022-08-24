@@ -44,7 +44,7 @@ class AsosScraper(unittest.TestCase):
             
 
     #Test that we are on the webpage
-    def est_title(self):
+    def st_title(self):
         mainPage = page.MainPage(self.driver)
         assert mainPage.does_title_match()
 

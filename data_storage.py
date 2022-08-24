@@ -119,9 +119,11 @@ class StoreData():
         '''
         #current_imgs = prods_frame.loc[:,'img_link']
         merged_dfs = pd.concat([old_frame, prods_frame])
-        merged_dfs = merged_dfs.astype("str")
-        final_df = merged_dfs.drop_duplicates(subset=['img_link'], keep = False)
+        #merged_dfs = merged_dfs.astype("str")
 
+        final_df = merged_dfs.drop_duplicates(subset=['img_link'], keep = False)
+        print("DEBUG: line 124 final_df=",final_df)
+        print("starting s3 upload....")
         for index,row in final_df.iterrows():
             filename = row.at['filename']
             image_link = row.at['img_link']
@@ -132,8 +134,9 @@ class StoreData():
             #        print("this is an old image")
              #       continue
             #    else:
-            self.save_image_to_s3(self, image_link, filename)
-            print("image uploaded to s3")
+            if self.save_image_to_s3(self, image_link, filename):
+                print("image uploaded to s3")
+            
 
     def save_image_to_s3(self,image_link,filename):
         '''
@@ -155,6 +158,8 @@ class StoreData():
             response = self.s3_client.upload_file(filename, self.bucket_name, image)
         except ClientError as E:
             print("test upload 2 s3 exception",E)
+            return False
+        return True
             
     def upload_raw_data_to_datalake(self):
         """
