@@ -1,10 +1,8 @@
-import unittest
-import page
 import data_storage
-import time
 import json
+import page
+import unittest
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
 #Scraper class
 class AsosScraper(unittest.TestCase):
@@ -22,10 +20,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-same-origin')
         option.add_argument('--disable-secure-scripts')
         option.add_argument("-window-size=1920,1080")
-        #option.add_argument("--disable-extensions")
         option.add_argument('--no-sandbox')
-        #option.add_argument('--allow-insecure-localhost')
-        #option.add_argument('--disable-blink-features=AutomationControlled')
         option.add_argument(f'user-agent={user_agent}')
         option.add_argument('--disable-dev-shm-usage')
         option.add_argument('--headless')
@@ -44,7 +39,7 @@ class AsosScraper(unittest.TestCase):
             
 
     #Test that we are on the webpage
-    def st_title(self):
+    def est_title(self):
         mainPage = page.MainPage(self.driver)
         assert mainPage.does_title_match()
 
@@ -111,20 +106,20 @@ class AsosScraper(unittest.TestCase):
 
 
     #Test to fill and upload the raw_data folder to an amazon s3 bucket
-    def est_upload_raw_data_to_s3(self):
+    def test_upload_raw_data_to_s3(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
-        mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
-        df = product_page.scrape_prod_pages(self.href_list)
+        prods_frame = product_page.scrape_prod_pages(self.href_list)
         store_data = data_storage.StoreData(self.rds_params, self.s3_params)
-        store_data.upload_raw_data_to_datalake()
+        engine = store_data.create_engine()
+        store_data.save_images_to_s3(prods_frame, engine)
 
     #test to upload 1 search result page of scraped data to my relational database
-    def test_upload_frames_to_rds(self):
+    def est_upload_frames_to_rds(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_men()
@@ -134,9 +129,9 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
         data_store = data_storage.StoreData(self.rds_params, self.s3_params)
-        data_store.process_data(prods_frame)
+        data_store.send_dataframe_to_rds(prods_frame)
         
-    def est_upload_to_rds_and_upload_to_datalake(self):
+    def est_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
         mainpage.headless_accept_cookies()
         mainpage.navigate_to_women()
@@ -147,8 +142,6 @@ class AsosScraper(unittest.TestCase):
         prods_frame = product_page.scrape_prod_pages(self.href_list)
         data_store = data_storage.StoreData(self.rds_params, self.s3_params)
         data_store.process_data(prods_frame)
-        data_store.upload_raw_data_to_datalake()
-
 
     #Method to close the webdriver    
     def tearDown(self):

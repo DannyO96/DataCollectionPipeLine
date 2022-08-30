@@ -1,13 +1,12 @@
-import tempfile
 import boto3
 import json
 import os
-import urllib.request
+import pandas as pd
+import requests
 import shutil
 import sqlalchemy
-import pandas as pd
-import psycopg2
-import psycopg
+import tempfile
+import urllib.request
 from botocore.exceptions import ClientError
 from datetime import datetime
 
@@ -107,38 +106,29 @@ class StoreData():
         '''
         This is a funtion to check the relational database for matching image links drop duplicates and upload any new images to the s3 bucket.
         '''
-        #df = pd.DataFrame
-        #dfd = pd.concat([df, prods_frame])
         old_frame = pd.read_sql_table('products_new', engine)
         '''
-        old_imgs = []
-
-        for index, row in old_frame.iterrows():
-            img_link = row.at['img_link']
-            old_imgs.append(img_link)
+        merged_df = pd.concat([prods_frame, old_frame], ignore_index = True, axis = 0)
+        merged_df = merged_df.astype("str")
+        final_df = prods_frame.drop_duplicates(subset=['img_link'], keep = False)
         '''
-        #current_imgs = prods_frame.loc[:,'img_link']
-        merged_dfs = pd.concat([old_frame, prods_frame])
-        #merged_dfs = merged_dfs.astype("str")
+        '''data = [[pd.NA, pd.NA, pd.NA, pd.NA,pd.NA, pd.NA, pd.NA, pd.NA,pd.NA, pd.NA, pd.NA, pd.NA]],'''
+        dataframes = [prods_frame, old_frame]
+        template = pd.DataFrame( columns = ['date_time', 'filename', 'product_name', 'href', 'UUID', 'product_code', 'size_info', 'img_info', 'product_details', 'about_product', 'price_info', 'img_link'])
+        dataframes= [i if not i.empty else template for i in dataframes]
+        final_df = pd.concat(dataframes)
 
-        final_df = merged_dfs.drop_duplicates(subset=['img_link'], keep = False)
         print("DEBUG: line 124 final_df=",final_df)
         print("starting s3 upload....")
+
         for index,row in final_df.iterrows():
             filename = row.at['filename']
             image_link = row.at['img_link']
-            #image_link_list = []
-            #image_link_list.append(image_link)
-            #for image_link in image_link_list:
-            #    if image_link in old_imgs:
-            #        print("this is an old image")
-             #       continue
-            #    else:
-            if self.save_image_to_s3(self, image_link, filename):
+            if self.save_image_to_s3(image_link, filename):
                 print("image uploaded to s3")
             
 
-    def save_image_to_s3(self,image_link,filename):
+    def save_image_to_s3(self, image_link, filename):
         '''
         This is a function to upload a single image to s3
         Args:
@@ -154,8 +144,10 @@ class StoreData():
             ClientError
         '''
         try:
-            image = urllib.request.urlretrieve(image_link)
-            response = self.s3_client.upload_file(filename, self.bucket_name, image)
+            image = requests.get(image_link).content
+            tmp = tempfile.NamedTemporaryFile(mode = 'w+b')
+            temp = tmp.write(image)
+            response = self.s3_client.upload_fileobj(temp, self.bucket_name, image)
         except ClientError as E:
             print("test upload 2 s3 exception",E)
             return False
@@ -224,8 +216,9 @@ class StoreData():
         engine = self.create_engine()
         print("uploading images to s3....")
         self.save_images_to_s3(prods_frame, engine)
-        print("saving dataframe to rds....")
-        self.send_dataframe_to_rds(prods_frame)
+        print("done")
+        #print("saving dataframe to rds....")
+        #self.send_dataframe_to_rds(prods_frame)
         
     def check_for_duplicates(self):
         '''
