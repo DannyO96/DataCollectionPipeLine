@@ -1,4 +1,5 @@
 import boto3
+import io
 import json
 import os
 import pandas as pd
@@ -128,7 +129,7 @@ class StoreData():
                 print("image uploaded to s3")
             
 
-    def save_image_to_s3(self, image_link, filename):
+    def save_image_to_s3(self, image_link, filename: str):
         '''
         This is a function to upload a single image to s3
         Args:
@@ -147,7 +148,9 @@ class StoreData():
             image = requests.get(image_link).content
             tmp = tempfile.NamedTemporaryFile(mode = 'w+b')
             temp = tmp.write(image)
-            response = self.s3_client.upload_fileobj(temp, self.bucket_name, image)
+            response = self.s3_client.upload_fileobj(io.BytesIO(image), self.bucket_name, tmp.name)
+        
+            print("Binary image uploaded to s3")
         except ClientError as E:
             print("test upload 2 s3 exception",E)
             return False

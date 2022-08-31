@@ -15,9 +15,9 @@ class SearchResultsPageLocators(object):
     IMG_TAG = (By.TAG_NAME, 'img')
     LOAD_MORE = (By.CSS_SELECTOR, "#plp > div > div.rwglXzC > div > a")
 
-class ProductPageLocators(object):
-#primary product page 
-    GALLERY_IMAGE = (By.XPATH, '//*[@id="product-gallery"]/div[2]/div[2]/div[2]/img')
+class ProductPageLocators(object): 
+#Primary product page locators  
+    GALLERY_IMAGE = (By.XPATH, '//*[@id="product-gallery"]/div[2]/div[3]/div[2]/img')#//*[@id="product-gallery"]/div[2]/div[2]/div[2]/img
     PRODUCT_NAME = (By.XPATH, '//*[@id="pdp-react-critical-app"]/h1')
     PRODUCT_DETAILS_CONTAINER = (By.XPATH,'//*[@id="product-details-container"]/div[4]/div/a[1]')
     PRODUCT_CODE = (By.XPATH,'//*[@id="product-details-container"]/div[2]/div[1]/p')

@@ -436,8 +436,8 @@ class ProductPage(BasePage):
         product_details = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS)
         about_product = self.driver.find_element(*ProductPageLocators.ABOUT_PRODUCT)
         price_info = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
-        img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
-        image_link = img_tag.get_attribute('src')
+        galler_img = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
+        image_link = galler_img.get_attribute('src')
 
         image_link_list = []
         product_name_list = []
