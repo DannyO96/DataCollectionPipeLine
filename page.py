@@ -122,6 +122,7 @@ class MainPage(BasePage):
         self.driver.delete_all_cookies()
         element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
+        print('Accepted Cookies')
 
     def search_asos(self):
         """

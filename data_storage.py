@@ -23,6 +23,8 @@ class StoreData():
         and initialises the boto3 s3 client module for interacting with my s3 buckets.
         It also takes rds params from my.secrets.RDSdb.json to interact with my postgresql database.
         """
+        #engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
+
         self.bucket_name = s3_params['bucket_name']
         self.aws_access_key_id = s3_params['aws_access_key_id']
         self.aws_secret_access_key = s3_params['aws_secret_access_key']
@@ -92,7 +94,9 @@ class StoreData():
         dataframes = [prods_frame, old_frame]
         template = pd.DataFrame( columns = ['date_time', 'filename', 'product_name', 'href', 'UUID', 'product_code', 'size_info', 'img_info', 'product_details', 'about_product', 'price_info', 'img_link'])
         dataframes= [i if not i.empty else template for i in dataframes]
-        final_df = pd.concat(dataframes)
+        merged_df = pd.concat(dataframes)
+        final_df = merged_df.drop_duplicates(subset = ['img_link'], keep = False)
+
 
         print("DEBUG: line 124 final_df=",final_df)
         print("starting s3 upload....")

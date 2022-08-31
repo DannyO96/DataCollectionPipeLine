@@ -68,7 +68,7 @@ class AsosScraper(unittest.TestCase):
         mainpage.accept_cookies()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
-        self.href_list = search_result_page.get_href_List()
+        self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         product_page.scrape_prod_pages(self.href_list)
 
@@ -119,7 +119,7 @@ class AsosScraper(unittest.TestCase):
         store_data.save_images_to_s3(prods_frame, engine)
 
     #test to upload 1 search result page of scraped data to my relational database
-    def test_upload_dataframe_to_rds(self):
+    def est_upload_dataframe_to_rds(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_men()
@@ -131,7 +131,7 @@ class AsosScraper(unittest.TestCase):
         data_store = data_storage.StoreData(self.rds_params, self.s3_params)
         data_store.send_dataframe_to_rds(prods_frame)
         
-    def est_upload_to_rds_and_upload_to_s3(self):
+    def test_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
@@ -141,7 +141,9 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
         data_store = data_storage.StoreData(self.rds_params, self.s3_params)
-        data_store.process_data(prods_frame)
+        self.engine = data_store.create_engine()
+        data_store.save_images_to_s3(prods_frame, self.engine)
+        data_store.send_dataframe_to_rds(prods_frame)
 
     #Method to close the webdriver    
     def tearDown(self):
