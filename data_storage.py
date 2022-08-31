@@ -27,15 +27,7 @@ class StoreData():
         self.aws_access_key_id = s3_params['aws_access_key_id']
         self.aws_secret_access_key = s3_params['aws_secret_access_key']
         self.s3_client = boto3.client("s3")
-        # Create a dictionary of the current image checksums(assumed md5 as < 16MB) I have stored in the bucket.
-        '''
-        self.s3_etags = {}
-        keys = self.s3_client.list_objects(Bucket=self.bucket_name)['Contents']
-        for key in keys:
-        self.s3_etags[self.s3_client.head_object(Bucket=self.bucket_name,Key=key)['ResponseMetadata']['HTTPHeaders']['etag']]=key
-        print()
-        '''
-        #self.rds_params = {"database_type":self.database_type, "dbapi":self.dbapi, "endpoint":self.endpoint, "user":self.user, "password":self.password, "database":self.database, "port":self.port}
+     
         self.database_type = rds_params['database_type']
         self.dbapi = rds_params['dbapi']
         self.endpoint = rds_params['endpoint']
@@ -64,17 +56,6 @@ class StoreData():
         for index,row in prods_frame.iterrows():
             filename = row.at['filename']
             self.locally_save_frame_and_image(row, filename)
-        #rows = prods_frame.loc[]
-        #filename = product_name.text
-        #sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-        #os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        #folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        #filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
-        #frame.to_json(filepath, orient = 'table', default_handler=str)
-        #filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
-        #img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
-        #image_link = img_tag.get_attribute('src')
-        #urllib.request.urlretrieve(image_link, filepath2)
 
     def locally_save_frame_and_image(self, frame : pd.DataFrame, filename):
         """
@@ -108,12 +89,6 @@ class StoreData():
         This is a funtion to check the relational database for matching image links drop duplicates and upload any new images to the s3 bucket.
         '''
         old_frame = pd.read_sql_table('products_new', engine)
-        '''
-        merged_df = pd.concat([prods_frame, old_frame], ignore_index = True, axis = 0)
-        merged_df = merged_df.astype("str")
-        final_df = prods_frame.drop_duplicates(subset=['img_link'], keep = False)
-        '''
-        '''data = [[pd.NA, pd.NA, pd.NA, pd.NA,pd.NA, pd.NA, pd.NA, pd.NA,pd.NA, pd.NA, pd.NA, pd.NA]],'''
         dataframes = [prods_frame, old_frame]
         template = pd.DataFrame( columns = ['date_time', 'filename', 'product_name', 'href', 'UUID', 'product_code', 'size_info', 'img_info', 'product_details', 'about_product', 'price_info', 'img_link'])
         dataframes= [i if not i.empty else template for i in dataframes]
@@ -220,19 +195,5 @@ class StoreData():
         print("uploading images to s3....")
         self.save_images_to_s3(prods_frame, engine)
         print("done")
-        #print("saving dataframe to rds....")
-        #self.send_dataframe_to_rds(prods_frame)
         
-    def check_for_duplicates(self):
-        '''
-        SELECT * FROM
-        (SELECT *, count(*)
-        OVER
-        (PARTITION BY
-        product_name,
-        filename
-        ) AS count
-        FROM products_new) tableWithCount
-        WHERE tableWithCount.count > 1;
-        '''
 

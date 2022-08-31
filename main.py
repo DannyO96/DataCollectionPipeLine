@@ -12,7 +12,6 @@ class AsosScraper(unittest.TestCase):
 
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         option = webdriver.ChromeOptions()
-
         option.add_argument('--disable-notifications')
         option.add_argument('--disable-forms')
         option.add_argument('--disable-scripts')
@@ -46,7 +45,7 @@ class AsosScraper(unittest.TestCase):
     #test to accept cookies
     def est_accept_cookies(self):
         mainPage = page.MainPage(self.driver)
-        mainPage.headless_accept_cookies()
+        mainPage.accept_cookies()
 
     #Test to search asos
     def est_search_asos(self):
@@ -71,7 +70,7 @@ class AsosScraper(unittest.TestCase):
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_List()
         product_page = page.ProductPage(self.driver)
-        product_page.scrape_links(self.href_list)
+        product_page.scrape_prod_pages(self.href_list)
 
     #Test to locally save the dataframes in the raw data folder with their corresponding images
     def est_locally_save_dataframes_and_images(self):
@@ -83,12 +82,14 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
+        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store.save_locally(prods_frame)
 
 
     #Test to scrape multiple pages of products and upload the product data to s3 and rds
     def est_scrape_lots_of_prods(self):
         mainpage = page.MainPage(self.driver)
-        mainpage.headless_accept_cookies()
+        mainpage.accept_cookies()
         mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
@@ -104,11 +105,10 @@ class AsosScraper(unittest.TestCase):
         data_store = data_storage.StoreData(self.rds_params, self.s3_params)
         data_store.process_data(prods_frame)
 
-
-    #Test to fill and upload the raw_data folder to an amazon s3 bucket
-    def test_upload_raw_data_to_s3(self):
+    #Test to upload and image data scraped into an amazon s3 bucket
+    def est_upload_img_data_to_s3(self):
         mainpage = page.MainPage(self.driver)
-        mainpage.headless_accept_cookies()
+        mainpage.accept_cookies()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
@@ -119,9 +119,9 @@ class AsosScraper(unittest.TestCase):
         store_data.save_images_to_s3(prods_frame, engine)
 
     #test to upload 1 search result page of scraped data to my relational database
-    def est_upload_frames_to_rds(self):
+    def test_upload_dataframe_to_rds(self):
         mainpage = page.MainPage(self.driver)
-        mainpage.headless_accept_cookies()
+        mainpage.accept_cookies()
         mainpage.navigate_to_men()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
@@ -133,7 +133,7 @@ class AsosScraper(unittest.TestCase):
         
     def est_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
-        mainpage.headless_accept_cookies()
+        mainpage.accept_cookies()
         mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)

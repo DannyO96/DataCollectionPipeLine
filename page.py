@@ -2,16 +2,12 @@ import re
 import os
 import uuid
 import pandas as pd
-import urllib.request
 import selenium
 import requests
-from data_storage import StoreData
 from datetime import datetime
 from locators import MainPageLocators
 from locators import ProductPageLocators
 from locators import SearchResultsPageLocators
-from element import BasePageElement
-from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
@@ -126,12 +122,6 @@ class MainPage(BasePage):
         self.driver.delete_all_cookies()
         element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
-        
-    def headless_accept_cookies(self):
-        self.driver.delete_all_cookies()
-        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
-        element.click()
-        print("cookies accepted")
 
     def search_asos(self):
         """
@@ -216,23 +206,7 @@ class SearchResultPage(BasePage):
                 pass
             else:
                 href_list.append(href)
-        #print(href_list)
         return(href_list)
-
-    def is_results_found(self):
-        """
-        This is a function to test the title of the webpage
-
-        Args:
-            param1: self
-
-        Returns:
-            This is a description of what is returned.
-
-        Raises:
-            KeyError: Raises an exception.
-        """
-        return "No results found." not in self.driver.page_source
 
      #function to load more search results after the initial search
     def load_more_results(self):
@@ -282,18 +256,16 @@ class ProductPage(BasePage):
 
     def switch_iframes(self):
         """
-        This is an example of Google style.
+        This is a funtion to switch the iframe on the open webpage.
 
         Args:
-            param1: This is the first param.
-            param2: This is a second param.
+            param1: Self.
 
         Returns:
-            This is a description of what is returned.
+            This funtion switches the frame back to the default content after and iframe pop up occurs
 
         Raises:
-            KeyError: Raises an exception.
-            elementnotfound error: raised when elements that are interacted with in the function cannot be found
+            KeyError:elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
         iframes = self.driver.find_elements(*ProductPageLocators.IFRAMES)
         print(len(iframes))
@@ -313,67 +285,6 @@ class ProductPage(BasePage):
         """
         UUID = str(uuid.uuid4())
         return UUID
-
-    def scrape_links(self, href_list):
-        """
-        This is my original function to scrape links from asos product pages this function was made before asos introduced multiple product page types and as such no longer works
-        successfully.
-
-        Args:
-            param1: self.
-            param2: href_list, this is a list of links to product pages.
-
-        Returns:
-            Tis function returns a pandas dataframe.
-
-        Raises:
-            KeyError: Raises an exception.
-            elementnotfound error: raised when elements that are interacted with in the function cannot be found
-        """
-        image_link_list = []
-        productname_list = []
-        uuid_list = []
-        prodcode_list = []
-        sizeinfo_list = []
-        imginfo_list = []
-        proddetails_list = []
-        aboutprod_list = []
-        priceinfo_list = []
-
-        for href in tqdm(href_list):
-            self.driver.get(href)
-            print("current href is ?", href)
-            UUID = self.create_uuid()
-            self.switch_iframes()
-            element = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-            element.click()
-            self.switch_iframes()
-
-            product_name = self.driver.find_element(*ProductPageLocators.PRODUCT_NAME)
-            product_code = self.driver.find_element(*ProductPageLocators.PRODUCT_CODE)
-            size_info = self.driver.find_element(*ProductPageLocators.SIZE_INFO)
-            img_info = self.driver.find_element(*ProductPageLocators.IMG_INFO)
-            product_details = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS)
-            about_product = self.driver.find_element(*ProductPageLocators.ABOUT_PRODUCT)
-            price_info = self.driver.find_element(*ProductPageLocators.PRICE_INFO)
-            img_tag = self.driver.find_element(*SearchResultsPageLocators.IMG_TAG)
-            image_link = img_tag.get_attribute('src')
-            
-            image_link_list.append(image_link)
-            productname_list.append(product_name.text)
-            uuid_list.append(UUID)
-            prodcode_list.append(product_code.text)
-            sizeinfo_list.append(size_info.text)
-            imginfo_list.append(img_info.text)
-            proddetails_list.append(product_details.text)
-            aboutprod_list.append(about_product.text)
-            priceinfo_list.append(price_info.text)
-
-            prod_dict = {'product_name': productname_list,'href': i, 'UUID': uuid_list, 'product_code': prodcode_list, 'size_info' : sizeinfo_list, 'img_info' : imginfo_list, 'product_details' : proddetails_list, 'about_product' : aboutprod_list, 'price_info'  : priceinfo_list, 'img_link' : image_link_list}
-        frame = pd.DataFrame.from_dict(prod_dict, ignore_index=True)
-        
-        print(frame)
-        return(frame)
 
     def assert_prod_page_type(self, UUID, i):
         """
@@ -544,36 +455,6 @@ class ProductPage(BasePage):
         """
         new_filename = slugify(filename)
         return(new_filename)
-        
-    def save_dataframe_and_image_locally(self, frame, filename):
-        """
-        This is a function that locally saves the dataframe and the gallery image of the product in the raw data folder
-
-        Args:
-            param1: self
-            param2: frame - this is the dataframe returned from scraping one of the types of product page
-            param3: filename - this is the name of the product file
-
-        Returns:
-            This returns a folder in the raw_data folder where the name of the product is turned into a slug so it can be used as a foldername the foldername also incoperates 
-            sys dtime to avoid duplicate folders and allow for time period analysis of the data. The folder returned is named after the product and contains the gallery image jpeg and
-            the dataframe in json format.
-
-        Raises:
-            TypeError: decoding to str: need a bytes-like object, int found. occurs when attempting to slugify file this occurs because the the type is not byte like.
-        
-        #filename = product_name.text
-        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-        os.makedirs("/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        folder = (r"/home/danny/git/DataCollectionPipeline/raw_data/"f"{filename}{sys_dtime}")
-        filepath = os.path.join(folder, f"{filename}{sys_dtime}.json")
-        frame.to_json(filepath, orient = 'table', default_handler=str)
-        filepath2 = os.path.join(folder, f"{filename}{sys_dtime}.jpeg")
-        img_tag = self.driver.find_element(*ProductPageLocators.GALLERY_IMAGE)
-        image_link = img_tag.get_attribute('src')
-        urllib.request.urlretrieve(image_link, filepath2)
-
-        return (frame, filename)"""
 
     def scrape_prod_pages(self, href_list):
         """
