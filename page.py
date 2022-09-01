@@ -1,9 +1,7 @@
-import re
-import os
-import uuid
 import pandas as pd
-import selenium
 import requests
+import selenium
+import uuid
 from datetime import datetime
 from locators import MainPageLocators
 from locators import ProductPageLocators

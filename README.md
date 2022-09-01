@@ -1,8 +1,7 @@
 '''
 DATA COLLECTION PIPELINE
 
-work in progress - not all files are in use, most recent version uses main.py page.py locators.py and data_storage.py
-Grabs T-Shirts from ASOS - to generate a repo of products & prices. 
+work in progress - Grabs T-Shirts from ASOS - to generate a repo of products & prices. 
 
 I have created funtions to dynamically scrape asos and append the information to dictionaries and dictionaries of lists and then initialise a pandas dataframe. However manipulating and storing the data has been put on hold as my project has been interuppted by an asos student discount pop up that appears to be an iframe
 I have implemented methods to close the iframe although they are increasing the time taken for the scraper to scrape data.
@@ -42,7 +41,10 @@ that in order to save images and dataframes locally I will need to use pandas to
 All tests are working successfully now I am beggining to focus on learning sql to allow for better database management and to prevent rescraping of images and dataframes where the dataframes are analagous as we still want to rescrape any changes in products information most notably price. I have implemented the pandas drop_duplicates method to avoid rescraping of previously scraped information using the filename, href  and price as the subset for my duplicates.
 Although this may need to also include size information so I can track changes in price and size availabillity within my dataset. After attempting to connect to the s3 bucket and check the etags of each item in the bucket im going to check the relational database for duplicate image links that have already been uploaded. The initial logic for this process is passing the unit test but doesnt actually appear to be uploading to the s3 bucket yet.
 
-The arcitecture of my code means that methods in the data storage method are not seperated enough so I've had to rewrite the code to upload to s3 so i can upload to s3 and save my data locally seperately. Ive also realised that my test arcitecture is also insufficient and im scraping to many products at once to check that my uploads are working correctly annoyingly this revelation has come far to late in the testing stage.
+The arcitecture of my code means that methods in the data storage method are not seperated enough so I've had to rewrite the code to upload to s3 so i can upload to s3 and save my data locally seperately. Ive also realised that my test arcitecture is also insufficient and im scraping to many products at once to check that my uploads are working correctly annoyingly this revelation has come far to late in the testing stage. 
+
+Testing has finished for the most part with regards to the scraper and im beggining to create a dockerfile and and requirements.txt file for the dockerfile
+so my scraper can run in a docer container on an ec2 instance.
 
 
 
