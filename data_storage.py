@@ -21,7 +21,8 @@ class StoreData():
         and initialises the boto3 s3 client module for interacting with my s3 buckets.
         It also takes rds params from my.secrets.RDSdb.json to interact with my postgresql database.
         """
-        #engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
+
+        #self.engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
 
         self.bucket_name = s3_params['bucket_name']
         self.aws_access_key_id = s3_params['aws_access_key_id']
@@ -166,7 +167,7 @@ class StoreData():
         engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
         return engine
 
-    def send_dataframe_to_rds(self, frame):
+    def send_dataframe_to_rds(self, frame, engine):
         """
         This is a function to check the database for name and price duplicates then convert the resulting pandas dataframe to sql
         and send it to my relational database.
@@ -182,18 +183,17 @@ class StoreData():
             ValueError: this error is raised when the incorrect datatype is passed to the function.
         
         """
-        engine = self.create_engine()
         old_frame = pd.read_sql_table('products_new', engine)
         merged_dfs = pd.concat([old_frame, frame])
         merged_dfs = merged_dfs.astype("str")
         final_df = merged_dfs.drop_duplicates(subset=['filename', 'product_name', 'href', 'price_info'], keep = False)
         final_df.to_sql('products_new', con=engine, if_exists='append', index=False)
         
-    def process_data(self, prods_frame):
+    def process_data(self, prods_frame, engine):
         """
         The dataframe is uloaded to rds by calling the send dataframe to rds method
         """
-        engine = self.create_engine()
+        #engine = self.create_engine()
         print("uploading images to s3....")
         self.save_images_to_s3(prods_frame, engine)
         print("done")

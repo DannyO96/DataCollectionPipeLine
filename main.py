@@ -36,7 +36,6 @@ class AsosScraper(unittest.TestCase):
         f = open('my.secrets.RDSdb.json', "r")
         self.rds_params = json.loads(f.read())
             
-
     #Test that we are on the webpage
     def est_title(self):
         mainPage = page.MainPage(self.driver)
@@ -82,7 +81,7 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
         data_store.save_locally(prods_frame)
 
 
@@ -102,7 +101,7 @@ class AsosScraper(unittest.TestCase):
                 break
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
         data_store.process_data(prods_frame)
 
     #Test to upload and image data scraped into an amazon s3 bucket
@@ -114,9 +113,8 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        store_data = data_storage.StoreData(self.rds_params, self.s3_params)
-        engine = store_data.create_engine()
-        store_data.save_images_to_s3(prods_frame, engine)
+        store_data = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
+        store_data.save_images_to_s3(prods_frame, self.engine)
 
     #test to upload 1 search result page of scraped data to my relational database
     def est_upload_dataframe_to_rds(self):
@@ -128,7 +126,7 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
         data_store.send_dataframe_to_rds(prods_frame)
         
     def test_upload_to_rds_and_upload_to_s3(self):
@@ -143,7 +141,7 @@ class AsosScraper(unittest.TestCase):
         data_store = data_storage.StoreData(self.rds_params, self.s3_params)
         self.engine = data_store.create_engine()
         data_store.save_images_to_s3(prods_frame, self.engine)
-        data_store.send_dataframe_to_rds(prods_frame)
+        data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #Method to close the webdriver    
     def tearDown(self):
