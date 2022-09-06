@@ -44,7 +44,7 @@ Although this may need to also include size information so I can track changes i
 The arcitecture of my code means that methods in the data storage method are not seperated enough so I've had to rewrite the code to upload to s3 so i can upload to s3 and save my data locally seperately. Ive also realised that my test arcitecture is also insufficient and im scraping to many products at once to check that my uploads are working correctly annoyingly this revelation has come far to late in the testing stage. 
 
 Testing has finished for the most part with regards to the scraper and im beggining to create a dockerfile and and requirements.txt file for the dockerfile
-so my scraper can run in a docer container on an ec2 instance. I have also moved the sqlalchemy engine variable to the innit method of my data_storage module for good practice.
+so my scraper can run in a docer container on an ec2 instance. My dockerfile is working although i need to create .env files for my database and s3bucket credentials as currently im unable to connect to them from the container.
 
 
 

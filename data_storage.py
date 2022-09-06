@@ -73,7 +73,7 @@ class StoreData():
             the dataframe in json format.
 
         Raises:
-            T
+            
         """
         image_link = frame.at['img_link']
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")

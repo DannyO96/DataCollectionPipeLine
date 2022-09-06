@@ -523,7 +523,74 @@ class ProductPage(BasePage):
         print("scrape_prod_pages.prods_frame=",prods_frame)
         return(prods_frame)
             
+    def scrape_prod_page(self, href_list):
+        """
+        This is a function to scrape multiple product page types
 
+        Args:
+            param1: self.
+            param2: href_list, this is a list of links to product pages returned from the function get href list.
+
+        Returns:
+            This function iterates through every link in the href list, checks for know exceptions then 
+            creates a UUID for the product asserts the type of product page then creates a dataframe which has two collumns added for date time and 
+            the slugifyed filename. This dataframe for a single product is then concatenated to the dataframe of all the products which is returned 
+            after all the products have been scraped.
+
+        Raises:
+            TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label or a something gone wrong label although try and accept blocks 
+            have now been implemented to avoid this error.
+        """
+        prods_frame = pd.DataFrame()
+        
+        for href in tqdm(href_list):
+            self.driver.get(href)
+            try:
+                try:
+                    out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
+                    oos = WebElement.is_displayed(out_of_stock)
+                except selenium.common.exceptions.NoSuchElementException:
+                    oos=False
+                try:
+                    something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
+                    sgw = WebElement.is_displayed(something_gone_wrong)
+                except selenium.common.exceptions.NoSuchElementException:
+                    sgw=False
+                try:
+                    container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                    pdc = WebElement.is_displayed(container)
+                except selenium.common.exceptions.NoSuchElementException:
+                    pdc = False
+                try:
+                    desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
+                    pdb = WebElement.is_displayed(desc_button)
+                except selenium.common.exceptions.NoSuchElementException:
+                    pdb = False
+                scrapable = pdc or pdb 
+            except Exception as E:
+                print('Exception: ', E)
+            print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
+
+            if oos == True or sgw == True or scrapable == False:
+                print('something wrong')
+                continue
+            
+            else:
+                UUID = self.create_uuid()
+                print('uuid created')
+                frame, self.filename = self.assert_prod_page_type(href, UUID)
+                try:
+                    filename = self.format_filename(self.filename)
+                except:
+                    print("cant slug filename its got an int in it...")
+                    continue
+                sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+                frame.insert(0, "filename", filename)
+                frame.insert(0, "date_time", sys_dtime)
+                prods_frame = pd.concat([prods_frame,frame])
+                break
+        print("scrape_prod_pages.prods_frame=",prods_frame)
+        return(prods_frame)
 
 
 
