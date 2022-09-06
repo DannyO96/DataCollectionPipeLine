@@ -25,7 +25,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
     
-        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
+        self.driver = webdriver.Chrome("/usr/local/bin/chromedriver",options = option)#/home/danny/chromedriver
         self.driver.get("https://www.asos.com/")
 
         # JSON file for s3 bucket credentials
