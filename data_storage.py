@@ -8,6 +8,7 @@ import tempfile
 import urllib.request
 from botocore.exceptions import ClientError
 from datetime import datetime
+from decouple import config
 
 
 
@@ -23,12 +24,22 @@ class StoreData():
         """
 
         #self.engine = sqlalchemy.create_engine(f"{self.database_type}://{self.user}:{self.password}@{self.endpoint}:{self.port}/{self.database}")
-
-        self.bucket_name = s3_params['bucket_name']
-        self.aws_access_key_id = s3_params['aws_access_key_id']
-        self.aws_secret_access_key = s3_params['aws_secret_access_key']
+        self.bucket_name = config('bucket_name')
+        self.aws_access_key_id = config('aws_access_key_id')
+        self.aws_secret_access_key = config('aws_secret_access_key')
+        #self.bucket_name = s3_params['bucket_name']
+        #self.aws_access_key_id = s3_params['aws_access_key_id']
+        #self.aws_secret_access_key = s3_params['aws_secret_access_key']
         self.s3_client = boto3.client("s3")
-     
+
+        #self.database_type = config['database_type']
+        #self.dbapi = config['dbapi']
+        #self.endpoint = config['endpoint']
+        #self.user = config['user']
+        #self.password = config['password']
+        #self.database = config['database']
+        #self.port = config['port']
+
         self.database_type = rds_params['database_type']
         self.dbapi = rds_params['dbapi']
         self.endpoint = rds_params['endpoint']
