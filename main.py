@@ -18,23 +18,22 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--disable-secure-containers')
         option.add_argument('--disable-same-origin')
         option.add_argument('--disable-secure-scripts')
-        option.add_argument("-window-size=1920,1080")
+        option.add_argument('-window-size=1920,1080')
         option.add_argument('--no-sandbox')
         option.add_argument(f'user-agent={user_agent}')
         option.add_argument('--disable-dev-shm-usage')
         option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
 
-        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)# /usr/local/bin/chromedriver
+        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)#/home/danny/chromedriver   /usr/local/bin/chromedriver
         self.driver.get("https://www.asos.com/")
 
         #JSON file for s3 bucket credentials
-        f = open('my.secrets.AWSbucket.json', "r")
-        self.s3_params = json.loads(f.read())
-
+        #f = open('my.secrets.AWSbucket.json', "r")
+        #self.s3_params = json.loads(f.read())
         #JSON file for RDS credentials
-        f = open('my.secrets.RDSdb.json', "r")
-        self.rds_params = json.loads(f.read())
+        #f = open('my.secrets.RDSdb.json', "r")
+        #self.rds_params = json.loads(f.read())
             
     #Test that we are on the webpage
     def est_title(self):
@@ -129,7 +128,7 @@ class AsosScraper(unittest.TestCase):
         data_store.send_dataframe_to_rds(prods_frame)
 
     #This test consitutes the final scraper it scrapes product information then uploads it to cloud storage    
-    def est_upload_to_rds_and_upload_to_s3(self):
+    def test_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
@@ -138,12 +137,12 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store = data_storage.StoreData()
         self.engine = data_store.create_engine()
         data_store.save_images_to_s3(prods_frame, self.engine)
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
-    def test_upload_single_frame(self):
+    def est_upload_single_frame(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
@@ -152,7 +151,7 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_page(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params)
+        data_store = data_storage.StoreData() #self.rds_params, self.s3_params
         self.engine = data_store.create_engine()
         data_store.save_images_to_s3(prods_frame, self.engine)
         data_store.send_dataframe_to_rds(prods_frame, self.engine)

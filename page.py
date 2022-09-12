@@ -285,7 +285,7 @@ class ProductPage(BasePage):
         UUID = str(uuid.uuid4())
         return UUID
 
-    def assert_prod_page_type(self, UUID, i):
+    def assert_prod_page_type(self, UUID, href):
         """
         This is a function to determine the type of product page the webdriver is on.
 
@@ -300,20 +300,23 @@ class ProductPage(BasePage):
         Raises:
             KeyError: Raises an exception.
         """
-        prod_dict = 1
-        filename = 1
+        #frame = pd.DataFrame
+        #filename = 1
         
         try:
             WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
-            prod_dict, filename = self.scrape_primary_prodpage(UUID, i)
-        except:
+            frame, filename = self.scrape_primary_prodpage(UUID, href)
+        except Exception as e:
+            print("Locator PRODUCT_DETAILS_CONTAINER. Exception:",e," href:",str(href))
             try:
                 WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
-                prod_dict, filename = self.scrape_altprod_pages(UUID, i)
-            except:
+                frame, filename = self.scrape_altprod_pages(UUID, href)
+            except Exception as e:
+                print("Locator PRODUCT_DESCRIPTION_BUTTON. Exception:",e," href:",str(href))
+                return(pd.DataFrame, "FAIL")
                 pass
             
-        return(prod_dict, filename)
+        return(frame, filename)
 
     def scrape_primary_prodpage(self, i, UUID):
         """
@@ -372,8 +375,8 @@ class ProductPage(BasePage):
 
         prod_dict = {'product_name': name,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info_list, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
         frame = pd.DataFrame.from_dict(prod_dict)
-        print(frame)
-        filename = str(name).encode()
+        print(str(frame))
+        filename = str(name)
         return(frame, filename)
 
     def scrape_altprod_pages(self, i ,UUID):
@@ -432,11 +435,11 @@ class ProductPage(BasePage):
         prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
         self.switch_iframes()
         frame = pd.DataFrame.from_dict(prod_dict)
-        print(frame)
-        filename = (product_name.text)
-        filename_bytes = str(filename).encode()
-        return(frame, filename_bytes)
-    
+        print(str(frame))
+        filename = str(product_name.text)
+        #filename_bytes = str(filename).encode()
+        return(frame, filename)
+
     def format_filename(self, filename):
         """
         This is a function to turn the name of the file in to a system date time stamped slug ready to be save locally or on the cloud
@@ -513,11 +516,16 @@ class ProductPage(BasePage):
                 frame, self.filename = self.assert_prod_page_type(href, UUID)
                 try:
                     filename = self.format_filename(self.filename)
-                except:
-                    print("cant slug filename its got an int in it...")
+                except Exception as e:
+                    print("cant slug filename its got an int in it... Exception:",e," filename:",str(filename))
                     continue
                 sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-                frame.insert(0, "filename", filename)
+                print("filename:",str(filename))
+                try:
+                    frame.insert(0, "filename", filename)
+                except Exception as e:
+                    print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
+                    continue
                 frame.insert(0, "date_time", sys_dtime)
                 prods_frame = pd.concat([prods_frame,frame])
         print("scrape_prod_pages.prods_frame=",prods_frame)

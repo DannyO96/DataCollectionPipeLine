@@ -16,7 +16,7 @@ class StoreData():
     """
     This class is to interact with an s3 bucket to store images and features and to interact a relational database
     """
-    def __init__(self, rds_params, s3_params) -> None:
+    def __init__(self) -> None:#, rds_params, s3_params
         """
         This init method takes the s3 params from my.secrets.AWSbucket.json
         and initialises the boto3 s3 client module for interacting with my s3 buckets.
@@ -30,23 +30,23 @@ class StoreData():
         #self.bucket_name = s3_params['bucket_name']
         #self.aws_access_key_id = s3_params['aws_access_key_id']
         #self.aws_secret_access_key = s3_params['aws_secret_access_key']
-        self.s3_client = boto3.client("s3")
+        self.s3_client = boto3.Session(aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key).client("s3")
 
-        #self.database_type = config['database_type']
-        #self.dbapi = config['dbapi']
-        #self.endpoint = config['endpoint']
-        #self.user = config['user']
-        #self.password = config['password']
-        #self.database = config['database']
-        #self.port = config['port']
+        self.database_type = config('database_type')
+        self.dbapi = config('dbapi')
+        self.endpoint = config('endpoint')
+        self.user = config('user')
+        self.password = config('password')
+        self.database = config('database')
+        self.port = config('port')
 
-        self.database_type = rds_params['database_type']
-        self.dbapi = rds_params['dbapi']
-        self.endpoint = rds_params['endpoint']
-        self.user = rds_params['user']
-        self.password = rds_params['password']
-        self.database = rds_params['database']
-        self.port = rds_params['port']
+        #self.database_type = rds_params['database_type']
+        #self.dbapi = rds_params['dbapi']
+        #self.endpoint = rds_params['endpoint']
+        #self.user = rds_params['user']
+        #self.password = rds_params['password']
+        #self.database = rds_params['database']
+        #self.port = rds_params['port']
 
     def save_locally(self, prods_frame:pd.DataFrame):
         """
@@ -107,16 +107,16 @@ class StoreData():
         merged_df = pd.concat(dataframes)
         final_df = merged_df.drop_duplicates(subset = ['img_link'], keep = False)
 
-
         print("DEBUG: line 124 final_df=",final_df)
         print("starting s3 upload....")
-
+        print(os.environ["bucket_name"])
         for index,row in final_df.iterrows():
             filename = row.at['filename']
             image_link = row.at['img_link']
+            print(os.environ["bucket_name"])
+            print("reached line 120")
             if self.save_image_to_s3(image_link, filename):
                 print("image uploaded to s3")
-            
 
     def save_image_to_s3(self, image_link, filename: str):
         '''
