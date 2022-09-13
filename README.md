@@ -44,7 +44,9 @@ Although this may need to also include size information so I can track changes i
 The arcitecture of my code means that methods in the data storage method are not seperated enough so I've had to rewrite the code to upload to s3 so i can upload to s3 and save my data locally seperately. Ive also realised that my test arcitecture is also insufficient and im scraping to many products at once to check that my uploads are working correctly annoyingly this revelation has come far to late in the testing stage. 
 
 Testing has finished for the most part with regards to the scraper and im beggining to create a dockerfile and and requirements.txt file for the dockerfile
-so my scraper can run in a docer container on an ec2 instance. My dockerfile is working although i need to create .env files for my database and s3bucket credentials as currently im unable to connect to them from the container. Creating the environment variable files is proving more diffiocult than I initially expected. The python decouple module allows for configuration of environment varibles however currently struggling to get the containerised scraper to use the environment variable to upload image data to my s3 bucket.
+so my scraper can run in a docer container on an ec2 instance. My dockerfile is working although i need to create .env files for my database and s3bucket credentials as currently im unable to connect to them from the container. Creating the environment variable files is proving more diffiocult than I initially expected. The python decouple module allows for configuration of environment varibles from an .env file this then has to be passed to the container in order for it to be able to connect to the relational database and s3 bucket.
+
+I have created an ec2 instance on amazon rds and after specifying security credentials for allowed for inbound connections. I have been able to connect to the instance and install docker to pull my docker image to run the containerised scraper on the ec2 instance although the scraper isnt currently working there
 
 
 
