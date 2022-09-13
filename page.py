@@ -71,7 +71,7 @@ class MainPage(BasePage):
         Raises:
             
         """
-        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
+        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
         element.click()
 
     def navigate_to_women(self):
@@ -87,7 +87,7 @@ class MainPage(BasePage):
         Raises:
             Element not found: usually occurs when the locator for the button has changed as the website has been updated.
         """
-        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
+        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
         element.click()
 
     def click_search_bar(self):
@@ -118,7 +118,7 @@ class MainPage(BasePage):
             ElementNotFound: If the presence of the element is not located
         """
         self.driver.delete_all_cookies()
-        element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        element = WebDriverWait(self.driver, 50).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
         print('Accepted Cookies')
 
@@ -223,7 +223,7 @@ class SearchResultPage(BasePage):
             elementnotfound error: raised when elements that are interacted with in the function cannot be found
 
         """
-        element = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
+        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(SearchResultsPageLocators.LOAD_MORE))
         element.click()
 
 #Product page class containing methods occuring on the page of a product 
@@ -247,7 +247,7 @@ class ProductPage(BasePage):
 
         """
         try: 
-            element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT_CLOSE))
+            element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(ProductPageLocators.STUDENT_DISCOUNT_CLOSE))
             self.driver.execute_script("arguments[0].click();", element)
             print('discount closed')
         except Exception as ex:
@@ -304,12 +304,12 @@ class ProductPage(BasePage):
         #filename = 1
         
         try:
-            WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+            WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
             frame, filename = self.scrape_primary_prodpage(UUID, href)
         except Exception as e:
             print("Locator PRODUCT_DETAILS_CONTAINER. Exception:",e," href:",str(href))
             try:
-                WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+                WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
                 frame, filename = self.scrape_altprod_pages(UUID, href)
             except Exception as e:
                 print("Locator PRODUCT_DESCRIPTION_BUTTON. Exception:",e," href:",str(href))
@@ -336,7 +336,7 @@ class ProductPage(BasePage):
             KeyError: Raises an exception.
             elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
-        element = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
         element.click()
         print('clicked container')
         #self.close_alert()
@@ -401,27 +401,27 @@ class ProductPage(BasePage):
         about_me_list = []
         
         try:
-            product_description = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
+            product_description = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION))
             product_description_list.append(product_description.get_attribute("textContent"))
         except:
             product_description_list.append("NULL")
         try:
-            brand = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
+            brand = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.BRAND))
             brand_list.append(brand.get_attribute("textContent"))
         except:
             brand_list.append('NULL')
         try:
-            size_and_fit = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
+            size_and_fit = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.SIZE_AND_FIT))
             size_and_fit_list.append(size_and_fit.get_attribute("textContent"))
         except:
             size_and_fit_list.append('NULL')
         try:
-            look_after_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
+            look_after_me = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.LOOK_AFTER_ME))
             look_after_me_list.append(look_after_me.get_attribute("textContent"))
         except:
             look_after_me_list.append('NULL')
         try:
-            about_me = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
+            about_me = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.ABOUT_ME))
             about_me_list.append(about_me.get_attribute("textContent"))
         except:
             about_me_list.append('NULL')
