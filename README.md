@@ -46,7 +46,7 @@ The arcitecture of my code means that methods in the data storage method are not
 Testing has finished for the most part with regards to the scraper and im beggining to create a dockerfile and and requirements.txt file for the dockerfile
 so my scraper can run in a docer container on an ec2 instance. My dockerfile is working although i need to create .env files for my database and s3bucket credentials as currently im unable to connect to them from the container. Creating the environment variable files is proving more diffiocult than I initially expected. The python decouple module allows for configuration of environment varibles from an .env file this then has to be passed to the container in order for it to be able to connect to the relational database and s3 bucket.
 
-I have created an ec2 instance on amazon rds and after specifying security credentials for allowed for inbound connections. I have been able to connect to the instance and install docker to pull my docker image to run the containerised scraper on the ec2 instance although the scraper isnt currently working there
+I have created an ec2 instance on amazon rds and after specifying security credentials for allowed for inbound connections. I have been able to connect to the instance and install docker to pull my docker image to run the containerised scraper on the ec2 instance although the scraper isnt currently working there as there appears to be an issue with locating web elements on asos from the ec2 instance. This appears to be related to the ec2 instance itself as the containerised scraper runs as expected on my local machine.
 
 
 
