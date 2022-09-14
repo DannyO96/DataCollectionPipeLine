@@ -21,7 +21,7 @@ class BasePage(object):
     """
     This is the base page class it instanciates the webdriver and its methods are inherited by every page class in my page object model
     """
-    def __init__(self, driver):
+    def __init__(self, driver: selenium.webdriver.chrome.webdriver.WebDriver):
         self.driver = driver
 
 
@@ -118,6 +118,8 @@ class MainPage(BasePage):
             ElementNotFound: If the presence of the element is not located
         """
         self.driver.delete_all_cookies()
+        self.driver.get_screenshot_as_file("/home/ec2-user/env/screenshot.png")
+        print("screenshot taken")
         element = WebDriverWait(self.driver, 50).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
         print('Accepted Cookies')

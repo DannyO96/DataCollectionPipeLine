@@ -12,6 +12,8 @@ class AsosScraper(unittest.TestCase):
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         option = webdriver.ChromeOptions()
 
+        option.add_argument('--ignore-certificate-errors')
+        option.add_argument('--allow-running-insecure-content')
         option.add_argument('--disable-notifications')
         option.add_argument('--disable-forms')
         option.add_argument('--disable-scripts')
@@ -25,7 +27,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
 
-        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)#/home/danny/chromedriver   /usr/local/bin/chromedriver
+        self.driver = webdriver.Chrome("/usr/local/bin/chromedriver",options = option)#/home/danny/chromedriver   /usr/local/bin/chromedriver
         self.driver.get("https://www.asos.com/")
 
         #JSON file for s3 bucket credentials
@@ -80,8 +82,9 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
-        data_store.save_locally(prods_frame)
+        data_store = data_storage.StoreData()
+        self.engine = data_store.create_engine()
+        data_store.save_locally(prods_frame, self.engine)
 
     #Test to scrape multiple pages of products and upload the product data to s3 and rds
     def est_scrape_lots_of_prods(self):
@@ -99,8 +102,9 @@ class AsosScraper(unittest.TestCase):
                 break
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
-        data_store.process_data(prods_frame)
+        data_store = data_storage.StoreData()
+        self.engine = data_store.create_engine()
+        data_store.process_data(prods_frame, self.engine)
 
     #Test to upload and image data scraped into an amazon s3 bucket
     def est_upload_img_data_to_s3(self):
@@ -111,7 +115,8 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        store_data = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
+        store_data = data_storage.StoreData()
+        self.engine = store_data.create_engine()
         store_data.save_images_to_s3(prods_frame, self.engine)
 
     #test to upload 1 search result page of scraped data to my relational database
@@ -124,12 +129,14 @@ class AsosScraper(unittest.TestCase):
         self.href_list = search_result_page.get_href_list()
         product_page = page.ProductPage(self.driver)
         prods_frame = product_page.scrape_prod_pages(self.href_list)
-        data_store = data_storage.StoreData(self.rds_params, self.s3_params, self.engine)
-        data_store.send_dataframe_to_rds(prods_frame)
+        data_store = data_storage.StoreData()
+        self.engine = data_store.create_engine()
+        data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #This test consitutes the final scraper it scrapes product information then uploads it to cloud storage    
     def test_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
+        mainpage.print_page_source()
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
         mainpage.search_asos()
