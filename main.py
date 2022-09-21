@@ -2,6 +2,7 @@ import data_storage
 import json
 import page
 import unittest
+from fp.fp import FreeProxy
 from selenium import webdriver
 
 #Scraper class
@@ -9,9 +10,11 @@ class AsosScraper(unittest.TestCase):
 
     #Method to initialize the chromedriver
     def setUp(self):
+        #proxy = FreeProxy(country_id=['IRE']).get()
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         option = webdriver.ChromeOptions()
 
+        #option.add_argument('--proxy-server=%s' % proxy)
         option.add_argument('--ignore-certificate-errors')
         option.add_argument('--allow-running-insecure-content')
         option.add_argument('--disable-notifications')
@@ -27,7 +30,7 @@ class AsosScraper(unittest.TestCase):
         option.add_argument('--headless')
         option.add_argument('--disable-gpu')  
 
-        self.driver = webdriver.Chrome("/usr/local/bin/chromedriver",options = option)#/home/danny/chromedriver   /usr/local/bin/chromedriver
+        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)#/home/danny/chromedriver   /usr/local/bin/chromedriver
         self.driver.get("https://www.asos.com/")
 
         #JSON file for s3 bucket credentials
@@ -136,9 +139,9 @@ class AsosScraper(unittest.TestCase):
     #This test consitutes the final scraper it scrapes product information then uploads it to cloud storage    
     def test_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
-        mainpage.print_page_source()
+        #mainpage.print_page_source()
         mainpage.accept_cookies()
-        mainpage.navigate_to_women()
+        #mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()

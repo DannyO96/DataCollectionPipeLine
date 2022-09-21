@@ -118,9 +118,10 @@ class MainPage(BasePage):
             ElementNotFound: If the presence of the element is not located
         """
         self.driver.delete_all_cookies()
-        self.driver.get_screenshot_as_file("/home/ec2-user/env/screenshot.png")
-        print("screenshot taken")
+        #self.driver.get_screenshot_as_png("/home/ec2-user/env/screenshot.png")
+        #print("screenshot taken")
         element = WebDriverWait(self.driver, 50).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        #element = self.driver.execute_script("arguments[0].click();",self.driver.find_element(MainPageLocators.ACCEPT_COOKIES))
         element.click()
         print('Accepted Cookies')
 
