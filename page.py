@@ -6,11 +6,13 @@ from datetime import datetime
 from locators import MainPageLocators
 from locators import ProductPageLocators
 from locators import SearchResultsPageLocators
+from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 from slugify import slugify
+from threading import Thread
 from tqdm import tqdm
 
 """
@@ -461,6 +463,124 @@ class ProductPage(BasePage):
         new_filename = slugify(filename)
         return(new_filename)
 
+    def init_driver_worker(self, href_list): #create new instace of chrome then make it do its job
+        ##### init driver
+        options = webdriver.ChromeOptions
+        #you can't run multible instances of chrome
+        #  with the same profile being used,
+        #  so either create new profile for each instance or use incognito mode
+        #options.add_argument("--incognito")
+        user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
+        option = webdriver.ChromeOptions()
+        #option.add_argument('--proxy-server=%s' % proxy)
+        option.add_argument('--ignore-certificate-errors')
+        option.add_argument('--allow-running-insecure-content')
+        option.add_argument('--disable-notifications')
+        option.add_argument('--disable-forms')
+        option.add_argument('--disable-scripts')
+        option.add_argument('--disable-secure-containers')
+        option.add_argument('--disable-same-origin')
+        option.add_argument('--disable-secure-scripts')
+        option.add_argument('-window-size=1920,1080')
+        option.add_argument('--no-sandbox')
+        option.add_argument(f'user-agent={user_agent}')
+        option.add_argument('--disable-dev-shm-usage')
+        #option.add_argument('--headless')
+        option.add_argument('--disable-gpu')  
+
+        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
+        ##### do the task
+        prods_frame = pd.DataFrame()
+        
+        for href in tqdm(href_list):
+            self.driver.get(href)
+            self.accept_cookie()
+            try:
+                try:
+                    out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
+                    oos = WebElement.is_displayed(out_of_stock)
+                except selenium.common.exceptions.NoSuchElementException:
+                    oos=False
+                try:
+                    something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
+                    sgw = WebElement.is_displayed(something_gone_wrong)
+                except selenium.common.exceptions.NoSuchElementException:
+                    sgw=False
+                try:
+                    container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                    pdc = WebElement.is_displayed(container)
+                except selenium.common.exceptions.NoSuchElementException:
+                    pdc = False
+                try:
+                    desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
+                    pdb = WebElement.is_displayed(desc_button)
+                except selenium.common.exceptions.NoSuchElementException:
+                    pdb = False
+                scrapable = pdc or pdb 
+            except Exception as E:
+                print('Exception: ', E)
+            print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
+
+            if oos == True or sgw == True or scrapable == False:
+                print('something wrong')
+                continue
+            
+            else:
+                UUID = self.create_uuid()
+                print('uuid created')
+                frame, self.filename = self.assert_prod_page_type(href, UUID)
+                try:
+                    filename = self.format_filename(self.filename)
+                except Exception as e:
+                    print("cant slug filename its got an int in it... Exception:",e," filename:",str(filename))
+                    continue
+                sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+                print("filename:",str(filename))
+                try:
+                    frame.insert(0, "filename", filename)
+                except Exception as e:
+                    print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
+                    continue
+                frame.insert(0, "date_time", sys_dtime)
+                prods_frame = pd.concat([prods_frame,frame])
+        print("scrape_prod_pages.prods_frame=",prods_frame)
+        return(prods_frame)    
+        exit() #close the thread
+
+    def split_range(self, _range, parts): 
+        #split a range to chunks
+        chunk_size = int(len(_range)/parts)
+        chunks = [_range[x:x+chunk_size] for x in range(0, len(_range), chunk_size)]
+        return chunks
+    
+    def multithreading(self, href_list):
+        chunks = self.split_range(href_list, 4) # split the task to 9 instances of chrome
+        thread_workers = []
+        for chunk in chunks:
+            t = Thread(target=self.init_driver_worker, args=(chunk,))
+            thread_workers.append(t)
+            t.start()    
+        # wait for the thread_workers to finish
+        for t in thread_workers:
+            t.join()
+
+    def accept_cookie(self):
+        """
+        This is a function to accept cookies after loading the webpage
+
+        Args:
+            param1:self
+
+        Returns:
+            Clears cookie cache and clicks the accept cookies button
+
+        Raises:
+            ElementNotFound: If the presence of the element is not located
+        """
+        self.driver.delete_all_cookies()
+        element = WebDriverWait(self.driver, 50).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        element.click()
+
     def scrape_prod_pages(self, href_list):
         """
         This is a function to scrape multiple product page types
@@ -483,6 +603,7 @@ class ProductPage(BasePage):
         
         for href in tqdm(href_list):
             self.driver.get(href)
+            self.accept_cookie()
             try:
                 try:
                     out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
