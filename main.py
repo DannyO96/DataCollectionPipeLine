@@ -12,25 +12,25 @@ class AsosScraper(unittest.TestCase):
     def setUp(self):
         #proxy = FreeProxy(country_id=['IRE']).get()
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
-        option = webdriver.ChromeOptions()
+        options = webdriver.ChromeOptions()
 
         #option.add_argument('--proxy-server=%s' % proxy)
-        option.add_argument('--ignore-certificate-errors')
-        option.add_argument('--allow-running-insecure-content')
-        option.add_argument('--disable-notifications')
-        option.add_argument('--disable-forms')
-        option.add_argument('--disable-scripts')
-        option.add_argument('--disable-secure-containers')
-        option.add_argument('--disable-same-origin')
-        option.add_argument('--disable-secure-scripts')
-        option.add_argument('-window-size=1920,1080')
-        option.add_argument('--no-sandbox')
-        option.add_argument(f'user-agent={user_agent}')
-        option.add_argument('--disable-dev-shm-usage')
-        option.add_argument('--headless')
-        option.add_argument('--disable-gpu')  
+        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--allow-running-insecure-content')
+        options.add_argument('--disable-notifications')
+        options.add_argument('--disable-forms')
+        options.add_argument('--disable-scripts')
+        options.add_argument('--disable-secure-containers')
+        options.add_argument('--disable-same-origin')
+        options.add_argument('--disable-secure-scripts')
+        options.add_argument('-window-size=1920,1080')
+        options.add_argument('--no-sandbox')
+        options.add_argument(f'user-agent={user_agent}')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  
 
-        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)#/home/danny/chromedriver   /usr/local/bin/chromedriver
+        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)#/home/danny/chromedriver   /usr/local/bin/chromedriver
         self.driver.get("https://www.asos.com/")
 
         #JSON file for s3 bucket credentials
@@ -137,11 +137,11 @@ class AsosScraper(unittest.TestCase):
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #This test consitutes the final scraper it scrapes product information then uploads it to cloud storage    
-    def est_upload_to_rds_and_upload_to_s3(self):
+    def test_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
         #mainpage.print_page_source()
         mainpage.accept_cookies()
-        #mainpage.navigate_to_women()
+        mainpage.navigate_to_women()
         mainpage.search_asos()
         search_result_page = page.SearchResultPage(self.driver)
         self.href_list = search_result_page.get_href_list()
@@ -166,7 +166,7 @@ class AsosScraper(unittest.TestCase):
         data_store.save_images_to_s3(prods_frame, self.engine)
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
-    def test_multithread_scraping(self):
+    def est_multithread_scraping(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()

@@ -469,27 +469,26 @@ class ProductPage(BasePage):
         #you can't run multible instances of chrome
         #  with the same profile being used,
         #  so either create new profile for each instance or use incognito mode
-        #options.add_argument("--incognito")
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
-        option = webdriver.ChromeOptions()
+        options = webdriver.ChromeOptions()
         #option.add_argument('--proxy-server=%s' % proxy)
-        option.add_argument('--ignore-certificate-errors')
-        option.add_argument('--allow-running-insecure-content')
-        option.add_argument('--disable-notifications')
-        option.add_argument('--disable-forms')
-        option.add_argument('--disable-scripts')
-        option.add_argument('--disable-secure-containers')
-        option.add_argument('--disable-same-origin')
-        option.add_argument('--disable-secure-scripts')
-        option.add_argument('-window-size=1920,1080')
-        option.add_argument('--no-sandbox')
-        option.add_argument(f'user-agent={user_agent}')
-        option.add_argument('--disable-dev-shm-usage')
-        #option.add_argument('--headless')
-        option.add_argument('--disable-gpu')  
+        options.add_argument("--incognito")
+        #options.add_argument('--ignore-certificate-errors')
+        #options.add_argument('--allow-running-insecure-content')
+        #options.add_argument('--disable-notifications')
+        #options.add_argument('--disable-forms')
+        #options.add_argument('--disable-scripts')
+        #options.add_argument('--disable-secure-containers')
+        #options.add_argument('--disable-same-origin')
+        #options.add_argument('--disable-secure-scripts')
+        options.add_argument('-window-size=1920,1080')
+        #options.add_argument('--no-sandbox')
+        options.add_argument(f'user-agent={user_agent}')
+        #options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--headless')
+        #options.add_argument('--disable-gpu')  
 
-        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = option)
-        ##### do the task
+        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)
         prods_frame = pd.DataFrame()
         
         for href in tqdm(href_list):
@@ -543,8 +542,8 @@ class ProductPage(BasePage):
                     continue
                 frame.insert(0, "date_time", sys_dtime)
                 prods_frame = pd.concat([prods_frame,frame])
-        print("scrape_prod_pages.prods_frame=",prods_frame)
-        return(prods_frame)    
+                print("scrape_prod_pages.prods_frame=",prods_frame)
+        #return(prods_frame)    
         exit() #close the thread
 
     def split_range(self, _range, parts): 
@@ -554,7 +553,7 @@ class ProductPage(BasePage):
         return chunks
     
     def multithreading(self, href_list):
-        chunks = self.split_range(href_list, 4) # split the task to 9 instances of chrome
+        chunks = self.split_range(href_list, 4) # split the task to 4 instances of chrome
         thread_workers = []
         for chunk in chunks:
             t = Thread(target=self.init_driver_worker, args=(chunk,))
@@ -603,7 +602,6 @@ class ProductPage(BasePage):
         
         for href in tqdm(href_list):
             self.driver.get(href)
-            self.accept_cookie()
             try:
                 try:
                     out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
