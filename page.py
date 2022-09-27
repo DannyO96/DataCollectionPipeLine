@@ -2,7 +2,9 @@ import pandas as pd
 import requests
 import selenium
 import uuid
+import threading
 from datetime import datetime
+
 from locators import MainPageLocators
 from locators import ProductPageLocators
 from locators import SearchResultsPageLocators
@@ -310,20 +312,20 @@ class ProductPage(BasePage):
         
         try:
             WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
-            frame, filename = self.scrape_primary_prodpage(UUID, href)
+            prod_dict, filename = self.scrape_primary_prodpage(UUID, href)
         except Exception as e:
             print("Locator PRODUCT_DETAILS_CONTAINER. Exception:",e," href:",str(href))
             try:
                 WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
-                frame, filename = self.scrape_altprod_pages(UUID, href)
+                prod_dict, filename = self.scrape_altprod_pages(UUID, href)
             except Exception as e:
                 print("Locator PRODUCT_DESCRIPTION_BUTTON. Exception:",e," href:",str(href))
                 return(pd.DataFrame, "FAIL")
                 pass
             
-        return(frame, filename)
+        return(prod_dict, filename)
 
-    def scrape_primary_prodpage(self, i, UUID):
+    def scrape_primary_prodpage(self, href, UUID):
         """
         This is a function to scrape the primary product page type for information it clicks the product details container the creates a dataframe 
         of product information
@@ -378,11 +380,11 @@ class ProductPage(BasePage):
         price_info_list.append(price_info.text)
         name = (product_name.text)
 
-        prod_dict = {'product_name': name,'href': i, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info_list, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
-        frame = pd.DataFrame.from_dict(prod_dict)
-        print(str(frame))
+        prod_dict = {'product_name': name,'href': href, 'UUID': uuid_list, 'product_code': product_code_list, 'size_info' : size_info_list, 'img_info' : img_info_list, 'product_details' : product_details_list, 'about_product' : about_product_list, 'price_info'  : price_info_list, 'img_link' : image_link}
+        #frame = pd.DataFrame.from_dict(prod_dict)
+        #print(str(frame))
         filename = str(name)
-        return(frame, filename)
+        return(prod_dict, filename)
 
     def scrape_altprod_pages(self, i ,UUID):
         """
@@ -439,11 +441,11 @@ class ProductPage(BasePage):
 
         prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
         self.switch_iframes()
-        frame = pd.DataFrame.from_dict(prod_dict)
-        print(str(frame))
+        #frame = pd.DataFrame.from_dict(prod_dict)
+        #print(str(frame))
         filename = str(product_name.text)
         #filename_bytes = str(filename).encode()
-        return(frame, filename)
+        return(prod_dict, filename)
 
     def format_filename(self, filename):
         """
@@ -465,8 +467,7 @@ class ProductPage(BasePage):
 
     def init_driver_worker(self, href_list): #create new instace of chrome then make it do its job
         ##### init driver
-        options = webdriver.ChromeOptions
-        #you can't run multible instances of chrome
+        ##you can't run multible instances of chrome
         #  with the same profile being used,
         #  so either create new profile for each instance or use incognito mode
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
@@ -487,81 +488,65 @@ class ProductPage(BasePage):
         #options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--headless')
         #options.add_argument('--disable-gpu')  
-
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)
-        prods_frame = pd.DataFrame()
-        
+        cookie_get=True
         for href in tqdm(href_list):
-            self.driver.get(href)
-            self.accept_cookie()
+            prod_dict, filename = self.href_prod_page2dict(href, cookie_get)
+            cookie_get = False
+            self.df_tlock.acquire()
+            df = pd.DataFrame.from_dict(prod_dict)
             try:
-                try:
-                    out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
-                    oos = WebElement.is_displayed(out_of_stock)
-                except selenium.common.exceptions.NoSuchElementException:
-                    oos=False
-                try:
-                    something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
-                    sgw = WebElement.is_displayed(something_gone_wrong)
-                except selenium.common.exceptions.NoSuchElementException:
-                    sgw=False
-                try:
-                    container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-                    pdc = WebElement.is_displayed(container)
-                except selenium.common.exceptions.NoSuchElementException:
-                    pdc = False
-                try:
-                    desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
-                    pdb = WebElement.is_displayed(desc_button)
-                except selenium.common.exceptions.NoSuchElementException:
-                    pdb = False
-                scrapable = pdc or pdb 
-            except Exception as E:
-                print('Exception: ', E)
-            print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
+                df.insert(0, "filename", filename)
+            except Exception as e:
+                print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
+                df.insert(0, "filename","NOTAFILENAME")
+            df.insert(0, "date_time", sys_dtime)
+            #self.df_tlock.acquire()
+            self.dataframe = pd.concat([self.dataframe,df])
+            self.df_tlock.release()
 
-            if oos == True or sgw == True or scrapable == False:
-                print('something wrong')
+        '''
+        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+            print("filename:",str(filename))
+            try:
+                frame.insert(0, "filename", filename)
+            except Exception as e:
+                print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
                 continue
-            
-            else:
-                UUID = self.create_uuid()
-                print('uuid created')
-                frame, self.filename = self.assert_prod_page_type(href, UUID)
-                try:
-                    filename = self.format_filename(self.filename)
-                except Exception as e:
-                    print("cant slug filename its got an int in it... Exception:",e," filename:",str(filename))
-                    continue
-                sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-                print("filename:",str(filename))
-                try:
-                    frame.insert(0, "filename", filename)
-                except Exception as e:
-                    print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
-                    continue
-                frame.insert(0, "date_time", sys_dtime)
-                prods_frame = pd.concat([prods_frame,frame])
-                print("scrape_prod_pages.prods_frame=",prods_frame)
-        #return(prods_frame)    
-        exit() #close the thread
+            frame.insert(0, "date_time", sys_dtime)
+            prods_frame = pd.concat([prods_frame,frame])
+            print("scrape_prod_pages.prods_frame=",prods_frame)
+        '''
+    def href_prod_page2dict(self, href, cookie_get):
+        self.driver.get(href)
+        if cookie_get :
+            self.accept_cookie()
+        prod_dict, filename = self.scrape_prod_page(href)
+        return(prod_dict, filename)  
 
-    def split_range(self, _range, parts): 
+    def split_range(self, href_list, parts): 
         #split a range to chunks
-        chunk_size = int(len(_range)/parts)
-        chunks = [_range[x:x+chunk_size] for x in range(0, len(_range), chunk_size)]
+        chunk_size = int(len(href_list)/parts)
+        chunks = [href_list[x:x+chunk_size] for x in range(0, len(href_list), chunk_size)]
         return chunks
     
     def multithreading(self, href_list):
         chunks = self.split_range(href_list, 4) # split the task to 4 instances of chrome
         thread_workers = []
+        self.df_tlock = threading.Lock()
+        self.dataframe = pd.DataFrame
+
         for chunk in chunks:
-            t = Thread(target=self.init_driver_worker, args=(chunk,))
+            t = Thread(target=self.init_driver_worker(href_list), args=(chunk,))
             thread_workers.append(t)
             t.start()    
         # wait for the thread_workers to finish
         for t in thread_workers:
             t.join()
+        print(self.dataframe)
+
+    
 
     def accept_cookie(self):
         """
@@ -599,61 +584,22 @@ class ProductPage(BasePage):
             have now been implemented to avoid this error.
         """
         prods_frame = pd.DataFrame()
-        
         for href in tqdm(href_list):
             self.driver.get(href)
+            prod_dict, filename = self.scrape_prod_page(href)
+            frame = pd.DataFrame.from_dict(prod_dict)
+            sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
             try:
-                try:
-                    out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
-                    oos = WebElement.is_displayed(out_of_stock)
-                except selenium.common.exceptions.NoSuchElementException:
-                    oos=False
-                try:
-                    something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
-                    sgw = WebElement.is_displayed(something_gone_wrong)
-                except selenium.common.exceptions.NoSuchElementException:
-                    sgw=False
-                try:
-                    container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-                    pdc = WebElement.is_displayed(container)
-                except selenium.common.exceptions.NoSuchElementException:
-                    pdc = False
-                try:
-                    desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
-                    pdb = WebElement.is_displayed(desc_button)
-                except selenium.common.exceptions.NoSuchElementException:
-                    pdb = False
-                scrapable = pdc or pdb 
-            except Exception as E:
-                print('Exception: ', E)
-            print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
-
-            if oos == True or sgw == True or scrapable == False:
-                print('something wrong')
+                frame.insert(0, "filename", filename)
+            except Exception as e:
+                print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
                 continue
-            
-            else:
-                UUID = self.create_uuid()
-                print('uuid created')
-                frame, self.filename = self.assert_prod_page_type(href, UUID)
-                try:
-                    filename = self.format_filename(self.filename)
-                except Exception as e:
-                    print("cant slug filename its got an int in it... Exception:",e," filename:",str(filename))
-                    continue
-                sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-                print("filename:",str(filename))
-                try:
-                    frame.insert(0, "filename", filename)
-                except Exception as e:
-                    print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
-                    continue
-                frame.insert(0, "date_time", sys_dtime)
-                prods_frame = pd.concat([prods_frame,frame])
+            frame.insert(0, "date_time", sys_dtime)
+            prods_frame = pd.concat([prods_frame,frame])
         print("scrape_prod_pages.prods_frame=",prods_frame)
         return(prods_frame)
             
-    def scrape_prod_page(self, href_list):
+    def scrape_prod_page(self, href):
         """
         This is a function to scrape multiple product page types
 
@@ -671,56 +617,46 @@ class ProductPage(BasePage):
             TypeError: decoding to str: this occurs when the dataframe has not been created correctly usually due to an unhandled out of stock label or a something gone wrong label although try and accept blocks 
             have now been implemented to avoid this error.
         """
-        prods_frame = pd.DataFrame()
-        
-        for href in tqdm(href_list):
-            self.driver.get(href)
+        try:
             try:
-                try:
-                    out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
-                    oos = WebElement.is_displayed(out_of_stock)
-                except selenium.common.exceptions.NoSuchElementException:
-                    oos=False
-                try:
-                    something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
-                    sgw = WebElement.is_displayed(something_gone_wrong)
-                except selenium.common.exceptions.NoSuchElementException:
-                    sgw=False
-                try:
-                    container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
-                    pdc = WebElement.is_displayed(container)
-                except selenium.common.exceptions.NoSuchElementException:
-                    pdc = False
-                try:
-                    desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
-                    pdb = WebElement.is_displayed(desc_button)
-                except selenium.common.exceptions.NoSuchElementException:
-                    pdb = False
-                scrapable = pdc or pdb 
-            except Exception as E:
-                print('Exception: ', E)
-            print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
+                out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
+                oos = WebElement.is_displayed(out_of_stock)
+            except selenium.common.exceptions.NoSuchElementException:
+                oos=False
+            try:
+                something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
+                sgw = WebElement.is_displayed(something_gone_wrong)
+            except selenium.common.exceptions.NoSuchElementException:
+                sgw=False
+            try:
+                container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                pdc = WebElement.is_displayed(container)
+            except selenium.common.exceptions.NoSuchElementException:
+                pdc = False
+            try:
+                desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
+                pdb = WebElement.is_displayed(desc_button)
+            except selenium.common.exceptions.NoSuchElementException:
+                pdb = False
+            scrapable = pdc or pdb 
+        except Exception as E:
+            print('Exception: ', E)
+        print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
 
-            if oos == True or sgw == True or scrapable == False:
-                print('something wrong')
-                continue
-            
-            else:
-                UUID = self.create_uuid()
-                print('uuid created')
-                frame, self.filename = self.assert_prod_page_type(href, UUID)
-                try:
-                    filename = self.format_filename(self.filename)
-                except:
-                    print("cant slug filename its got an int in it...")
-                    continue
-                sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-                frame.insert(0, "filename", filename)
-                frame.insert(0, "date_time", sys_dtime)
-                prods_frame = pd.concat([prods_frame,frame])
-                break
-        print("scrape_prod_pages.prods_frame=",prods_frame)
-        return(prods_frame)
+        if oos == True or sgw == True or scrapable == False:
+            print('something wrong')
+            return() 
+
+        else:
+            UUID = self.create_uuid()
+            print('uuid created')
+            prod_dict, self.filename = self.assert_prod_page_type(href, UUID)
+            try:
+                filename = self.format_filename(self.filename)
+            except:
+                print("cant slug filename its got an int in it...")
+                return()
+            return(prod_dict, filename)
 
 
 
