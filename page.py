@@ -440,7 +440,7 @@ class ProductPage(BasePage):
         image_link = img_tag.get_attribute('src')
 
         prod_dict = {'product_name': (product_name.text),'href': i, 'UUID': UUID, 'product_description' : product_description_list, 'brand' : brand_list, 'size_and_fit' : size_and_fit_list, 'look_after_me' : look_after_me_list, 'about_me' : about_me_list, 'price_info' : (price_info.text), 'img_link' : image_link}
-        self.switch_iframes()
+        #self.switch_iframes()
         #frame = pd.DataFrame.from_dict(prod_dict)
         #print(str(frame))
         filename = str(product_name.text)
@@ -506,18 +506,6 @@ class ProductPage(BasePage):
             self.dataframe = pd.concat([self.dataframe,df])
             self.df_tlock.release()
 
-        '''
-        sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
-            print("filename:",str(filename))
-            try:
-                frame.insert(0, "filename", filename)
-            except Exception as e:
-                print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
-                continue
-            frame.insert(0, "date_time", sys_dtime)
-            prods_frame = pd.concat([prods_frame,frame])
-            print("scrape_prod_pages.prods_frame=",prods_frame)
-        '''
     def href_prod_page2dict(self, href, cookie_get):
         self.driver.get(href)
         if cookie_get :
@@ -532,14 +520,15 @@ class ProductPage(BasePage):
         return chunks
     
     def multithreading(self, href_list):
-        chunks = self.split_range(href_list, 4) # split the task to 4 instances of chrome
+        chunks = self.split_range(href_list, 4) #split the task to 4 instances of chrome
         thread_workers = []
         self.df_tlock = threading.Lock()
-        self.dataframe = pd.DataFrame
+        self.dataframe = pd.DataFrame()
 
         for chunk in chunks:
             t = Thread(target=self.init_driver_worker(href_list), args=(chunk,))
             thread_workers.append(t)
+            t.daemon(True)
             t.start()    
         # wait for the thread_workers to finish
         for t in thread_workers:
