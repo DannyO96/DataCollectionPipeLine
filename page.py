@@ -485,21 +485,21 @@ class ProductPage(BasePage):
         options.add_argument("--incognito")
         options.add_argument('-window-size=1920,1080')
         options.add_argument(f'user-agent={user_agent}')
-        options.add_argument('--headless')
+        #options.add_argument('--headless')
         #options.add_argument('--disable-gpu')  
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         verbose("tid="+str(threading.get_ident())+":initialising webdriver")
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)
         cookie_get=True
         for href in (href_list):
-            verbose("tid="+str(threading.get_ident())+":Getting href="+href)
+            verbose("tid="+str(threading.get_ident())+":Getting href="+str(href))
             try:
                 prod_dict, filename = self.href_prod_page2dict(href, cookie_get)
             except Exception as e:
                 print("Not scrapable because:", e)
                 continue
             cookie_get = False
-            #self.df_tlock.acquire()
+            self.df_tlock.acquire()
             df = pd.DataFrame.from_dict(prod_dict)
             try:
                 df.insert(0, "filename", filename)
@@ -507,7 +507,7 @@ class ProductPage(BasePage):
                 print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
                 df.insert(0, "filename","NOTAFILENAME")
             df.insert(0, "date_time", sys_dtime)
-            self.df_tlock.acquire()
+            #self.df_tlock.acquire()
             self.dataframe = pd.concat([self.dataframe,df])
             self.df_tlock.release()
 
@@ -530,12 +530,13 @@ class ProductPage(BasePage):
         self.df_tlock = threading.Lock()
         self.dataframe = pd.DataFrame()
 
-        for chunk in chunks:
-            t = Thread(target=self.init_driver_worker(chunk), args=(chunk,))
+        for chunk in (chunks):
+            t = Thread(target=self.init_driver_worker, args=(chunk,))
             thread_workers.append(t)
             #t.daemon()
+            verbose("tid="+t.name+":Starting new thread="+t.name)
             t.start() 
-            print("The number of thread workers is :", thread_workers)   
+            verbose("tid="+t.name+": thread_workers="+str(thread_workers))   
         # wait for the thread_workers to finish
         for t in thread_workers:
             t.join()
@@ -585,14 +586,14 @@ class ProductPage(BasePage):
             try:
                 prod_dict, filename = self.scrape_prod_page(href)
             except Exception as e:
-                print("Not scrapable because:", e)
+                verbose("Not scrapable because:"+ e)
                 continue
             frame = pd.DataFrame.from_dict(prod_dict)
             sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
             try:
                 frame.insert(0, "filename", filename)
             except Exception as e:
-                print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
+                verbose("Cannot add filename to frame. Exception:"+e+" filename:"+str(filename))
                 continue
             frame.insert(0, "date_time", sys_dtime)
             prods_frame = pd.concat([prods_frame,frame])
