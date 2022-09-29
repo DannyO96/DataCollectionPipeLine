@@ -2,8 +2,8 @@ import data_storage
 import json
 import page
 import unittest
-from fp.fp import FreeProxy
 from selenium import webdriver
+
 
 #Scraper class
 class AsosScraper(unittest.TestCase):
@@ -165,7 +165,8 @@ class AsosScraper(unittest.TestCase):
 
     #Method to close the webdriver    
     def tearDown(self):
-        self.driver.close
+        return
+        #self.driver.close
 
 if __name__ == "__main__":
     unittest.main()

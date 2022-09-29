@@ -17,6 +17,16 @@ from slugify import slugify
 from threading import Thread
 from tqdm import tqdm
 
+
+Verbose=True
+Debug=True
+def verbose(msg):
+    if Verbose:
+        print("VERB: ",msg) 
+def debug(msg):
+    if Debug:
+        print("DEBUG: ",msg) 
+
 """
 I have separated methods for scraping in a page object model meaning each page object contains methods 
 relevant to scraping that type of page on my chosen website.
@@ -472,29 +482,24 @@ class ProductPage(BasePage):
         #  so either create new profile for each instance or use incognito mode
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         options = webdriver.ChromeOptions()
-        #option.add_argument('--proxy-server=%s' % proxy)
         options.add_argument("--incognito")
-        #options.add_argument('--ignore-certificate-errors')
-        #options.add_argument('--allow-running-insecure-content')
-        #options.add_argument('--disable-notifications')
-        #options.add_argument('--disable-forms')
-        #options.add_argument('--disable-scripts')
-        #options.add_argument('--disable-secure-containers')
-        #options.add_argument('--disable-same-origin')
-        #options.add_argument('--disable-secure-scripts')
         options.add_argument('-window-size=1920,1080')
-        #options.add_argument('--no-sandbox')
         options.add_argument(f'user-agent={user_agent}')
-        #options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--headless')
         #options.add_argument('--disable-gpu')  
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
+        verbose("tid="+str(threading.get_ident())+":initialising webdriver")
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)
         cookie_get=True
-        for href in tqdm(href_list):
-            prod_dict, filename = self.href_prod_page2dict(href, cookie_get)
+        for href in (href_list):
+            verbose("tid="+str(threading.get_ident())+":Getting href="+href)
+            try:
+                prod_dict, filename = self.href_prod_page2dict(href, cookie_get)
+            except Exception as e:
+                print("Not scrapable because:", e)
+                continue
             cookie_get = False
-            self.df_tlock.acquire()
+            #self.df_tlock.acquire()
             df = pd.DataFrame.from_dict(prod_dict)
             try:
                 df.insert(0, "filename", filename)
@@ -502,7 +507,7 @@ class ProductPage(BasePage):
                 print("Cannot add filename to frame. Exception:",e," filename:",str(filename))
                 df.insert(0, "filename","NOTAFILENAME")
             df.insert(0, "date_time", sys_dtime)
-            #self.df_tlock.acquire()
+            self.df_tlock.acquire()
             self.dataframe = pd.concat([self.dataframe,df])
             self.df_tlock.release()
 
@@ -526,10 +531,11 @@ class ProductPage(BasePage):
         self.dataframe = pd.DataFrame()
 
         for chunk in chunks:
-            t = Thread(target=self.init_driver_worker(href_list), args=(chunk,))
+            t = Thread(target=self.init_driver_worker(chunk), args=(chunk,))
             thread_workers.append(t)
-            t.daemon(True)
-            t.start()    
+            #t.daemon()
+            t.start() 
+            print("The number of thread workers is :", thread_workers)   
         # wait for the thread_workers to finish
         for t in thread_workers:
             t.join()
@@ -575,7 +581,12 @@ class ProductPage(BasePage):
         prods_frame = pd.DataFrame()
         for href in tqdm(href_list):
             self.driver.get(href)
-            prod_dict, filename = self.scrape_prod_page(href)
+            print("the current href is :", href)
+            try:
+                prod_dict, filename = self.scrape_prod_page(href)
+            except Exception as e:
+                print("Not scrapable because:", e)
+                continue
             frame = pd.DataFrame.from_dict(prod_dict)
             sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
             try:
