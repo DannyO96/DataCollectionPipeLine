@@ -1,10 +1,9 @@
 import pandas as pd
 import requests
 import selenium
-import uuid
 import threading
+import uuid
 from datetime import datetime
-
 from locators import MainPageLocators
 from locators import ProductPageLocators
 from locators import SearchResultsPageLocators
@@ -17,7 +16,9 @@ from slugify import slugify
 from threading import Thread
 from tqdm import tqdm
 
-
+"""
+Verbose debugging method has been added to help to debug my multithreading this debugging should have been implementewd much earlier in the project
+"""
 Verbose=True
 Debug=True
 def verbose(msg):
@@ -85,7 +86,7 @@ class MainPage(BasePage):
         Raises:
             
         """
-        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
+        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
         element.click()
 
     def navigate_to_women(self):
@@ -101,7 +102,7 @@ class MainPage(BasePage):
         Raises:
             Element not found: usually occurs when the locator for the button has changed as the website has been updated.
         """
-        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
+        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
         element.click()
 
     def click_search_bar(self):
@@ -134,7 +135,7 @@ class MainPage(BasePage):
         self.driver.delete_all_cookies()
         #self.driver.get_screenshot_as_png("/home/ec2-user/env/screenshot.png")
         #print("screenshot taken")
-        element = WebDriverWait(self.driver, 50).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         #element = self.driver.execute_script("arguments[0].click();",self.driver.find_element(MainPageLocators.ACCEPT_COOKIES))
         element.click()
         print('Accepted Cookies')
@@ -302,7 +303,7 @@ class ProductPage(BasePage):
         UUID = str(uuid.uuid4())
         return UUID
 
-    def assert_prod_page_type(self, UUID, href):
+    def check_prod_page_type(self, UUID, href):
         """
         This is a function to determine the type of product page the webdriver is on.
 
@@ -321,17 +322,16 @@ class ProductPage(BasePage):
         #filename = 1
         
         try:
-            WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+            WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
             prod_dict, filename = self.scrape_primary_prodpage(UUID, href)
         except Exception as e:
             print("Locator PRODUCT_DETAILS_CONTAINER. Exception:",e," href:",str(href))
             try:
-                WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+                WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
                 prod_dict, filename = self.scrape_altprod_pages(UUID, href)
             except Exception as e:
                 print("Locator PRODUCT_DESCRIPTION_BUTTON. Exception:",e," href:",str(href))
-                return(pd.DataFrame, "FAIL")
-                pass
+                return("FAIL")
             
         return(prod_dict, filename)
 
@@ -353,7 +353,7 @@ class ProductPage(BasePage):
             KeyError: Raises an exception.
             elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
-        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+        element = WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
         element.click()
         print('clicked container')
         #self.close_alert()
@@ -383,7 +383,10 @@ class ProductPage(BasePage):
         product_name_list.append(product_name.text)
         uuid_list.append(UUID)
         product_code_list.append(product_code.text)
-        size_info_list.append(size_info.text)
+        try:
+            size_info_list.append(size_info.text)
+        except:
+            size_info_list.append("Size information unavailable")
         img_info_list.append(img_info.text)
         product_details_list.append(product_details.text)
         about_product_list.append(about_product.text)
@@ -475,26 +478,28 @@ class ProductPage(BasePage):
         new_filename = slugify(filename)
         return(new_filename)
 
-    def init_driver_worker(self, href_list): #create new instace of chrome then make it do its job
-        ##### init driver
-        ##you can't run multible instances of chrome
-        #  with the same profile being used,
-        #  so either create new profile for each instance or use incognito mode
+    def init_driver_workers(self, href_list): 
+        """
+        Args:
+        Returns:
+        Raises:
+        """
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         options = webdriver.ChromeOptions()
         options.add_argument("--incognito")
         options.add_argument('-window-size=1920,1080')
         options.add_argument(f'user-agent={user_agent}')
-        #options.add_argument('--headless')
-        #options.add_argument('--disable-gpu')  
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')  
         sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
         verbose("tid="+str(threading.get_ident())+":initialising webdriver")
-        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)
+        driver = webdriver.Chrome("/home/danny/chromedriver",options = options)# /usr/local/bin/chromedriver /home/danny/chromedriver
+        thread_page=ProductPage(driver)
         cookie_get=True
         for href in (href_list):
             verbose("tid="+str(threading.get_ident())+":Getting href="+str(href))
             try:
-                prod_dict, filename = self.href_prod_page2dict(href, cookie_get)
+                prod_dict, filename = thread_page.href_prod_page2dict(href, cookie_get)
             except Exception as e:
                 print("Not scrapable because:", e)
                 continue
@@ -512,6 +517,18 @@ class ProductPage(BasePage):
             self.df_tlock.release()
 
     def href_prod_page2dict(self, href, cookie_get):
+        """
+        This is a function to accept cookies after loading the webpage in a new instance of the chromedriver that has been initialised for a specific thread
+
+        Args:
+            param1:self
+
+        Returns:
+            Clears cookie cache and clicks the accept cookies button
+
+        Raises:
+            ElementNotFound: If the presence of the element is not located
+        """
         self.driver.get(href)
         if cookie_get :
             self.accept_cookie()
@@ -519,34 +536,55 @@ class ProductPage(BasePage):
         return(prod_dict, filename)  
 
     def split_range(self, href_list, parts): 
+        """
+        This is a function to split the href list into chunks using list comprehension
+
+        Args:
+            param1:self
+            param2: href_list: list of links
+            param3: parts the number of parts the href list is to be split into
+        Returns:
+            chunks: the name of the variable for a part of the href_list
+        """
         #split a range to chunks
         chunk_size = int(len(href_list)/parts)
         chunks = [href_list[x:x+chunk_size] for x in range(0, len(href_list), chunk_size)]
         return chunks
     
     def multithreading(self, href_list):
+        """
+        This is a function to call the different funtions to allow for multithreaded scraping
+
+        Args:
+            param1:self
+            param2: href_list: list of links
+
+        Raises:
+            ElementNotInteractable: If the threads have been created without their own instance of a chromedriver
+        """
         chunks = self.split_range(href_list, 4) #split the task to 4 instances of chrome
-        thread_workers = []
+        threads = []
         self.df_tlock = threading.Lock()
         self.dataframe = pd.DataFrame()
 
         for chunk in (chunks):
-            t = Thread(target=self.init_driver_worker, args=(chunk,))
-            thread_workers.append(t)
+
+            t = Thread(target=self.init_driver_workers, args=(chunk,))
+            threads.append(t)
             #t.daemon()
             verbose("tid="+t.name+":Starting new thread="+t.name)
             t.start() 
-            verbose("tid="+t.name+": thread_workers="+str(thread_workers))   
+            verbose("tid="+t.name+": thread_workers="+str(threads))   
         # wait for the thread_workers to finish
-        for t in thread_workers:
-            t.join()
+        for thread in threads:
+            thread.join()
         print(self.dataframe)
 
     
 
     def accept_cookie(self):
         """
-        This is a function to accept cookies after loading the webpage
+        This is a function to accept cookies after loading the webpage in a new instance of the chromedriver that has been initialised for a specific thread
 
         Args:
             param1:self
@@ -558,7 +596,7 @@ class ProductPage(BasePage):
             ElementNotFound: If the presence of the element is not located
         """
         self.driver.delete_all_cookies()
-        element = WebDriverWait(self.driver, 50).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        element = WebDriverWait(self.driver, 50).until(EC.element_to_be_clickable((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
 
     def scrape_prod_pages(self, href_list):
@@ -586,7 +624,7 @@ class ProductPage(BasePage):
             try:
                 prod_dict, filename = self.scrape_prod_page(href)
             except Exception as e:
-                verbose("Not scrapable because:"+ e)
+                verbose("Not scrapable because:"+ str(e))
                 continue
             frame = pd.DataFrame.from_dict(prod_dict)
             sys_dtime = datetime.now().strftime("%d_%m_%Y-%H%M")
@@ -594,7 +632,7 @@ class ProductPage(BasePage):
                 frame.insert(0, "filename", filename)
             except Exception as e:
                 verbose("Cannot add filename to frame. Exception:"+e+" filename:"+str(filename))
-                continue
+                frame.insert(0, "filename","NOTAFILENAME")
             frame.insert(0, "date_time", sys_dtime)
             prods_frame = pd.concat([prods_frame,frame])
         print("scrape_prod_pages.prods_frame=",prods_frame)
@@ -651,7 +689,11 @@ class ProductPage(BasePage):
         else:
             UUID = self.create_uuid()
             print('uuid created')
-            prod_dict, self.filename = self.assert_prod_page_type(href, UUID)
+            try:
+                prod_dict, self.filename = self.check_prod_page_type(href, UUID)
+            except:
+                print("no product details available")
+                return()
             try:
                 filename = self.format_filename(self.filename)
             except:

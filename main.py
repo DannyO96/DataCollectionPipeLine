@@ -10,11 +10,8 @@ class AsosScraper(unittest.TestCase):
 
     #Method to initialize the chromedriver
     def setUp(self):
-        #proxy = FreeProxy(country_id=['IRE']).get()
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         options = webdriver.ChromeOptions()
-
-        #option.add_argument('--proxy-server=%s' % proxy)
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--allow-running-insecure-content')
         options.add_argument('--disable-notifications')
@@ -25,6 +22,7 @@ class AsosScraper(unittest.TestCase):
         options.add_argument('--disable-secure-scripts')
         options.add_argument('-window-size=1920,1080')
         options.add_argument('--no-sandbox')
+        options.add_argument("--incognito")
         options.add_argument(f'user-agent={user_agent}')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--headless')
@@ -165,8 +163,7 @@ class AsosScraper(unittest.TestCase):
 
     #Method to close the webdriver    
     def tearDown(self):
-        return
-        #self.driver.close
+        self.driver.close()
 
 if __name__ == "__main__":
     unittest.main()
