@@ -28,7 +28,7 @@ class AsosScraper(unittest.TestCase):
         options.add_argument('--headless')
         options.add_argument('--disable-gpu')  
 
-        self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)#/home/danny/chromedriver   /usr/local/bin/chromedriver
+        self.driver = webdriver.Chrome("/usr/local/bin/chromedriver",options = options)#/home/danny/chromedriver   /usr/local/bin/chromedriver
         self.driver.get("https://www.asos.com/")
 
         #JSON file for s3 bucket credentials
@@ -150,7 +150,8 @@ class AsosScraper(unittest.TestCase):
         data_store.save_images_to_s3(prods_frame, self.engine)
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
-    def test_multithread_scraping(self):
+    #This test is to run the scraper on multiple threads of execution
+    def est_multithread_scraping(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
@@ -160,6 +161,21 @@ class AsosScraper(unittest.TestCase):
         product_page = page.ProductPage(self.driver)
         product_page.multithreading(self.href_list)
 
+    #This test is to run the scraper for a single product to debug s3 and rds connection issues
+    def test_upload_single_frame(self):
+        mainpage = page.MainPage(self.driver)
+        mainpage.accept_cookies()
+        mainpage.navigate_to_women()
+        mainpage.search_asos()
+        search_result_page = page.SearchResultPage(self.driver)
+        self.href_list = search_result_page.get_href_list()
+        product_page = page.ProductPage(self.driver)
+        prods_frame = product_page.scrape_prod_page(self.href_list)
+        data_store = data_storage.StoreData()
+        self.engine = data_store.create_engine()
+        data_store.save_images_to_s3(prods_frame, self.engine)
+        data_store.send_dataframe_to_rds(prods_frame, self.engine)
+        
 
     #Method to close the webdriver    
     def tearDown(self):

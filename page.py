@@ -546,14 +546,14 @@ class ProductPage(BasePage):
         Returns:
             chunks: the name of the variable for a part of the href_list
         """
-        #split a range to chunks
         chunk_size = int(len(href_list)/parts)
         chunks = [href_list[x:x+chunk_size] for x in range(0, len(href_list), chunk_size)]
         return chunks
     
     def multithreading(self, href_list):
         """
-        This is a function to call the different funtions to allow for multithreaded scraping
+        This is a function to call the different funtions to allow for multithreaded scraping it creates threads with a target of the innit driver worker function 
+        and the argument of chunks which is the result of the split range function.
 
         Args:
             param1:self
@@ -585,7 +585,7 @@ class ProductPage(BasePage):
     def accept_cookie(self):
         """
         This is a function to accept cookies after loading the webpage in a new instance of the chromedriver that has been initialised for a specific thread
-
+        
         Args:
             param1:self
 

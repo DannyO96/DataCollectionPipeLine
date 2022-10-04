@@ -100,7 +100,7 @@ class StoreData():
         '''
         This is a funtion to check the relational database for matching image links drop duplicates and upload any new images to the s3 bucket.
         '''
-        old_frame = pd.read_sql_table('products_new', engine)
+        old_frame = pd.read_sql_table('products_table', engine)
         dataframes = [prods_frame, old_frame]
         template = pd.DataFrame( columns = ['date_time', 'filename', 'product_name', 'href', 'UUID', 'product_code', 'size_info', 'img_info', 'product_details', 'about_product', 'price_info', 'img_link'])
         dataframes= [i if not i.empty else template for i in dataframes]
