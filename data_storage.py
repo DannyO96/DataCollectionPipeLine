@@ -194,11 +194,11 @@ class StoreData():
             ValueError: this error is raised when the incorrect datatype is passed to the function.
         
         """
-        old_frame = pd.read_sql_table('products_new', engine)
+        old_frame = pd.read_sql_table('products_table', engine)
         merged_dfs = pd.concat([old_frame, frame])
         merged_dfs = merged_dfs.astype("str")
         final_df = merged_dfs.drop_duplicates(subset=['filename', 'product_name', 'href', 'price_info'], keep = False)
-        final_df.to_sql('products_new', con=engine, if_exists='append', index=False)
+        final_df.to_sql('products_table', con=engine, if_exists='append', index=False)
         
     def process_data(self, prods_frame, engine):
         """
