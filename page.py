@@ -562,7 +562,7 @@ class ProductPage(BasePage):
         Raises:
             ElementNotInteractable: If the threads have been created without their own instance of a chromedriver
         """
-        chunks = self.split_range(href_list, 2) #split the task to 4 instances of chrome
+        chunks = self.split_range(href_list, 4) #split the task to 4 instances of chrome
         threads = []
         self.df_tlock = threading.Lock()
         self.dataframe = pd.DataFrame()

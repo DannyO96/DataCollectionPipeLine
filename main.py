@@ -30,7 +30,7 @@ class AsosScraper(unittest.TestCase):
 
         self.driver = webdriver.Chrome("/home/danny/chromedriver",options = options)#/home/danny/chromedriver   /usr/local/bin/chromedriver
         self.driver.get("https://www.asos.com/")
-
+        ##
         #JSON file for s3 bucket credentials
         #f = open('my.secrets.AWSbucket.json', "r")
         #self.s3_params = json.loads(f.read())
@@ -135,7 +135,7 @@ class AsosScraper(unittest.TestCase):
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #This test consitutes the final scraper it scrapes product information then uploads it to cloud storage    
-    def test_upload_to_rds_and_upload_to_s3(self):
+    def est_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
         #mainpage.print_page_source()
         mainpage.accept_cookies()
@@ -151,7 +151,7 @@ class AsosScraper(unittest.TestCase):
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #This test is to run the scraper on multiple threads of execution
-    def est_multithread_scraping(self):
+    def test_multithread_scraping(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()

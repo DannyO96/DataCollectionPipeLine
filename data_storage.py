@@ -151,14 +151,11 @@ class StoreData():
 
         Args:
             param1:self 
-
         Returns:
             Returns a bool indicating if the upload was successfull.
-
         Raises:
             TypeError
             ClientError
-
         """
         path = '/home/danny/git/DataCollectionPipeline/raw_data/'
         try:
