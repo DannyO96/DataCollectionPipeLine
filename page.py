@@ -86,7 +86,7 @@ class MainPage(BasePage):
         Raises:
             
         """
-        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
+        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(MainPageLocators.MEN_SECTION))
         element.click()
 
     def navigate_to_women(self):
@@ -102,7 +102,7 @@ class MainPage(BasePage):
         Raises:
             Element not found: usually occurs when the locator for the button has changed as the website has been updated.
         """
-        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
+        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(MainPageLocators.WOMEN_SECTION))
         element.click()
 
     def click_search_bar(self):
@@ -135,7 +135,7 @@ class MainPage(BasePage):
         self.driver.delete_all_cookies()
         #self.driver.get_screenshot_as_png("/home/ec2-user/env/screenshot.png")
         #print("screenshot taken")
-        element = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
+        element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((MainPageLocators.ACCEPT_COOKIES)))
         #element = self.driver.execute_script("arguments[0].click();",self.driver.find_element(MainPageLocators.ACCEPT_COOKIES))
         element.click()
         print('Accepted Cookies')
@@ -322,12 +322,12 @@ class ProductPage(BasePage):
         #filename = 1
         
         try:
-            WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+            WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
             prod_dict, filename = self.scrape_primary_prodpage(UUID, href)
         except Exception as e:
             print("Locator PRODUCT_DETAILS_CONTAINER. Exception:",e," href:",str(href))
             try:
-                WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
+                WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON))
                 prod_dict, filename = self.scrape_altprod_pages(UUID, href)
             except Exception as e:
                 print("Locator PRODUCT_DESCRIPTION_BUTTON. Exception:",e," href:",str(href))
@@ -353,7 +353,7 @@ class ProductPage(BasePage):
             KeyError: Raises an exception.
             elementnotfound error: raised when elements that are interacted with in the function cannot be found
         """
-        element = WebDriverWait(self.driver, 100).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
+        element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
         element.click()
         print('clicked container')
         #self.close_alert()
@@ -596,7 +596,7 @@ class ProductPage(BasePage):
             ElementNotFound: If the presence of the element is not located
         """
         self.driver.delete_all_cookies()
-        element = WebDriverWait(self.driver, 50).until(EC.element_to_be_clickable((MainPageLocators.ACCEPT_COOKIES)))
+        element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
 
     def scrape_prod_pages(self, href_list):
@@ -668,12 +668,12 @@ class ProductPage(BasePage):
             except selenium.common.exceptions.NoSuchElementException:
                 sgw=False
             try:
-                container = self.driver.find_element(*ProductPageLocators.PRODUCT_DETAILS_CONTAINER)
+                container = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((ProductPageLocators.PRODUCT_DETAILS_CONTAINER)))
                 pdc = WebElement.is_displayed(container)
             except selenium.common.exceptions.NoSuchElementException:
                 pdc = False
             try:
-                desc_button = self.driver.find_element(*ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)
+                desc_button = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)))
                 pdb = WebElement.is_displayed(desc_button)
             except selenium.common.exceptions.NoSuchElementException:
                 pdb = False
