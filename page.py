@@ -504,6 +504,7 @@ class ProductPage(BasePage):
                 print("Not scrapable because:", e)
                 continue
             cookie_get = False
+            verbose("locking thread")
             self.df_tlock.acquire()
             df = pd.DataFrame.from_dict(prod_dict)
             try:
@@ -562,7 +563,7 @@ class ProductPage(BasePage):
         Raises:
             ElementNotInteractable: If the threads have been created without their own instance of a chromedriver
         """
-        chunks = self.split_range(href_list, 4) #split the task to 4 instances of chrome
+        chunks = self.split_range(href_list, 1) #split the task to 4 instances of chrome
         threads = []
         self.df_tlock = threading.Lock()
         self.dataframe = pd.DataFrame()
@@ -598,6 +599,7 @@ class ProductPage(BasePage):
         self.driver.delete_all_cookies()
         element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((MainPageLocators.ACCEPT_COOKIES)))
         element.click()
+        print("thread has accepted cookies")
 
     def scrape_prod_pages(self, href_list):
         """
@@ -680,6 +682,7 @@ class ProductPage(BasePage):
             scrapable = pdc or pdb 
         except Exception as E:
             print('Exception: ', E)
+            scrapable = pdc or pdb
         print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
 
         if oos == True or sgw == True or scrapable == False:
