@@ -1,7 +1,6 @@
-'''
 DATA COLLECTION PIPELINE
 
-work in progress - Grabs T-Shirts from ASOS - to generate a repo of products & prices. 
+work in progress - Grabs T-Shirts from ASOS - to generate a repo of products & prices on a containerised ec2 instance. 
 
 I have created funtions to dynamically scrape asos and append the information to dictionaries and dictionaries of lists and then initialise a pandas dataframe. However manipulating and storing the data has been put on hold as my project has been interuppted by an asos student discount pop up that appears to be an iframe
 I have implemented methods to close the iframe although they are increasing the time taken for the scraper to scrape data.
@@ -40,5 +39,3 @@ I have created an ec2 instance on amazon rds and after specifying security crede
 After a few runs on the ec2 instance it would appear the the response from the website is bottlenecking the scraper and often extremely long website response times are causing element not found errors to try and combat this i am implementing multithreading on the scraper to minimise the amount of dead time when running on the ec2 instance. After struggling with my program arcitechture i have finally managed to get the scraper to work with multithreading although this may not save as much time as i initially thought as even when only running two threads the scraper crashes on the ec2 instance. I have created a crontab job on the ec2 instance to run the scraper every day at 7pm, although currently the cronjob will only run the scraper on a single thread.
  I have set up a prometheus container on my ec2 instance to begin monitoing my scraper so I can begin observing metrics the container was created using a prometheus.yml file which I transferred from my local machine via ssh. I have begun creating a grafana dashboard of the metrics collected by the prometheus container monitoring my containerised scraper on the ec2 instance.
 
-
-'''
