@@ -1,6 +1,6 @@
 DATA COLLECTION PIPELINE
 
-work in progress - Grabs T-Shirts from ASOS - to generate a repo of products & prices on a containerised ec2 instance. 
+work in progress - Grabs T-Shirts from ASOS - to generate a repo of products & prices on a containerised ec2 instance and monitor the metrics of the container with a prometheus container and visualise these metrics on a grafana dashboard. 
 
 I have created funtions to dynamically scrape asos and append the information to dictionaries and dictionaries of lists and then initialise a pandas dataframe. However manipulating and storing the data has been put on hold as my project has been interuppted by an asos student discount pop up that appears to be an iframe
 I have implemented methods to close the iframe although they are increasing the time taken for the scraper to scrape data.
