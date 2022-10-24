@@ -105,7 +105,8 @@ class AsosScraper(unittest.TestCase):
         prods_frame = product_page.scrape_prod_pages(self.href_list)
         data_store = data_storage.StoreData()
         self.engine = data_store.create_engine()
-        data_store.process_data(prods_frame, self.engine)
+        data_store.save_images_to_s3(prods_frame, self.engine)
+        data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #Test to upload and image data scraped into an amazon s3 bucket
     def est_upload_img_data_to_s3(self):
@@ -135,7 +136,7 @@ class AsosScraper(unittest.TestCase):
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #This test consitutes the final scraper it scrapes product information then uploads it to cloud storage    
-    def est_upload_to_rds_and_upload_to_s3(self):
+    def test_upload_to_rds_and_upload_to_s3(self):
         mainpage = page.MainPage(self.driver)
         #mainpage.print_page_source()
         mainpage.accept_cookies()
@@ -151,7 +152,7 @@ class AsosScraper(unittest.TestCase):
         data_store.send_dataframe_to_rds(prods_frame, self.engine)
 
     #This test is to run the scraper on multiple threads of execution
-    def test_multithread_scraping(self):
+    def est_multithread_scraping(self):
         mainpage = page.MainPage(self.driver)
         mainpage.accept_cookies()
         mainpage.navigate_to_women()
