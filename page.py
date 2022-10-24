@@ -8,6 +8,7 @@ from locators import MainPageLocators
 from locators import ProductPageLocators
 from locators import SearchResultsPageLocators
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
@@ -355,7 +356,7 @@ class ProductPage(BasePage):
         """
         element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(ProductPageLocators.PRODUCT_DETAILS_CONTAINER))
         element.click()
-        print('clicked container')
+        verbose('clicked container')
         #self.close_alert()
         #self.switch_iframes()
     
@@ -507,7 +508,7 @@ class ProductPage(BasePage):
             try:
                 prod_dict, filename = thread_page.href_prod_page2dict(href, cookie_get)
             except Exception as e:
-                print("Not scrapable because:", e)
+                verbose("Not scrapable because:"+e)
                 continue
             cookie_get = False
             verbose("locking thread")
@@ -569,7 +570,7 @@ class ProductPage(BasePage):
         Raises:
             ElementNotInteractable: If the threads have been created without their own instance of a chromedriver element cannot be interacted with
         """
-        chunks = self.split_range(href_list, 1) #split the task to 4 instances of chrome
+        chunks = self.split_range(href_list, 4) #split the task to 4 instances of chrome
         threads = []
         self.df_tlock = threading.Lock()
         self.dataframe = pd.DataFrame()
@@ -628,7 +629,7 @@ class ProductPage(BasePage):
         prods_frame = pd.DataFrame()
         for href in tqdm(href_list):
             self.driver.get(href)
-            print("the current href is :", href)
+            verbose("the current href is :"+ href)
             try:
                 prod_dict, filename = self.scrape_prod_page(href)
             except Exception as e:
@@ -643,7 +644,7 @@ class ProductPage(BasePage):
                 frame.insert(0, "filename","NOTAFILENAME")
             frame.insert(0, "date_time", sys_dtime)
             prods_frame = pd.concat([prods_frame,frame])
-        print("scrape_prod_pages.prods_frame=",prods_frame)
+        verbose("scrape_prod_pages.prods_frame="+prods_frame)
         return(prods_frame)
             
     def scrape_prod_page(self, href):
@@ -668,45 +669,44 @@ class ProductPage(BasePage):
             try:
                 out_of_stock = self.driver.find_element(*ProductPageLocators.OUT_OF_STOCK)
                 oos = WebElement.is_displayed(out_of_stock)
-            except selenium.common.exceptions.NoSuchElementException:
+            except NoSuchElementException:
                 oos=False
             try:
                 something_gone_wrong = self.driver.find_element(*ProductPageLocators.SOMETHING_GONE_WRONG)
                 sgw = WebElement.is_displayed(something_gone_wrong)
-            except selenium.common.exceptions.NoSuchElementException:
+            except NoSuchElementException:
                 sgw=False
             try:
-                container = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((ProductPageLocators.PRODUCT_DETAILS_CONTAINER)))
+                container = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((ProductPageLocators.PRODUCT_DETAILS_CONTAINER)))
                 pdc = WebElement.is_displayed(container)
-            except selenium.common.exceptions.NoSuchElementException:
+            except NoSuchElementException:
                 pdc = False
-            try:
-                desc_button = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)))
-                pdb = WebElement.is_displayed(desc_button)
-            except selenium.common.exceptions.NoSuchElementException:
-                pdb = False
-            scrapable = pdc or pdb 
+                try:
+                    desc_button = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((ProductPageLocators.PRODUCT_DESCRIPTION_BUTTON)))
+                    pdb = WebElement.is_displayed(desc_button)
+                except NoSuchElementException:
+                    pdb = False
+            #scrapable = (pdc or pdb)
         except Exception as E:
-            print('Exception: ', E)
-            scrapable = pdc or pdb
-        print("oos=",oos," sgw=",sgw," scrapable=",scrapable)    
-
+            verbose('scrape_prod_page Exception: '+ str(E)+'\n.')
+        scrapable = (pdc or pdb)
+        verbose("oos="+ str(oos) + " sgw="+ str(sgw) + " scrapable=" + str(scrapable))    
+        #scrapable = (pdc or pdb)
         if oos == True or sgw == True or scrapable == False:
-            print('something wrong')
+            verbose('something wrong')
             return() 
-
         else:
             UUID = self.create_uuid()
-            print('uuid created')
+            verbose('uuid created')
             try:
                 prod_dict, self.filename = self.check_prod_page_type(href, UUID)
             except:
-                print("no product details available")
+                verbose("no product details available")
                 return()
             try:
                 filename = self.format_filename(self.filename)
             except:
-                print("cant slug filename its got an int in it...")
+                verbose("cant slug filename its got an int in it...")
                 return()
             return(prod_dict, filename)
 
