@@ -480,9 +480,15 @@ class ProductPage(BasePage):
 
     def init_driver_workers(self, href_list): 
         """
+        This is a function to initialise threads with their own instance of chrome it is called by the multithreading function.
         Args:
+            param1: self
+            param2: href_list
         Returns:
+            A product frame from each thread that is concatonated after a thread lock as concatenation is a thread unsafe operation
+
         Raises:
+            So many different errors i cant list them all
         """
         user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
         options = webdriver.ChromeOptions()
@@ -561,7 +567,7 @@ class ProductPage(BasePage):
             param2: href_list: list of links
 
         Raises:
-            ElementNotInteractable: If the threads have been created without their own instance of a chromedriver
+            ElementNotInteractable: If the threads have been created without their own instance of a chromedriver element cannot be interacted with
         """
         chunks = self.split_range(href_list, 1) #split the task to 4 instances of chrome
         threads = []
